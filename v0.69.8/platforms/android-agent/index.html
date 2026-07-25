@@ -1,0 +1,3607 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Cross-platform parental controls — server, agents, and cloud console integration">
+      
+      
+      
+        <link rel="canonical" href="https://pantherale0.github.io/timekpr-webui/v0.69.8/platforms/android-agent/">
+      
+      
+        <link rel="prev" href="../linux-agent/">
+      
+      
+        <link rel="next" href="../android-bypasses/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Android agent - Guardian Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#android-agent" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Guardian Documentation" class="md-header__button md-logo" aria-label="Guardian Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Guardian Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Android agent
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/pantherale0/timekpr-webui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pantherale0/timekpr-webui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../linux-agent/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Platforms
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../web-ui/dashboard/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Web UI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../workflows/pairing-and-approval/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../features/app-discovery/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/policy-matrix/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../troubleshooting/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Troubleshooting
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../development/contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Guardian Documentation" class="md-nav__button md-logo" aria-label="Guardian Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Guardian Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/pantherale0/timekpr-webui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pantherale0/timekpr-webui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    vs commercial parental controls
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/server-deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platforms
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Platforms
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../linux-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linux agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Android agent
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Android agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#battery-efficient-connectivity-fcm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battery-efficient connectivity (FCM)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Battery-efficient connectivity (FCM)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#server-fcm-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server FCM configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#screen-time-lockout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Screen time lockout
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Screen time lockout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phone-exemption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phone exemption
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#future-screentime-whitelist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future screentime whitelist
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pairing-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pairing flows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pairing flows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-app-pairing-qr-installed-apk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In-app pairing QR (installed APK)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#android-mdm-provisioning-qr-factory-reset-6-tap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Android MDM provisioning QR (factory-reset / 6-tap)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Android MDM provisioning QR (factory-reset / 6-tap)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#release-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generating-and-encoding-the-keystore-for-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generating and Encoding the Keystore for CI/CD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#required-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required permissions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-user-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-user support
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multi-user support">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-device-owner-do-requirement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Device Owner (DO) Requirement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provisioning-device-owner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provisioning Device Owner
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provisioning Device Owner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#method-a-mdmandroid-enterprise-qr-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method A: MDM/Android Enterprise QR (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#method-b-adb-android-debug-bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method B: ADB (Android Debug Bridge)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-user-management-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-User Management Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domain-block-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain block notifications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-approvals-app-launch-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access approvals (app launch + domains)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Access approvals (app launch + domains)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app-launch-sync_apparmor_policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        App launch (sync_apparmor_policy)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domain-access-update_domain_policy_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain access (update_domain_policy_manifest)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-restrictions-sync_android_device_policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device restrictions (sync_android_device_policy)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-unenrollment-and-factory-reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device unenrollment and factory reset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app-policies-on-android" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        App policies on Android
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installed-application-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installed application inventory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anti-bypass-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anti-bypass hardening
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Versioning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Versioning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automatic updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../android-bypasses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Android bypass matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../windows-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windows agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nintendo-switch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nintendo Switch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../xbox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Xbox
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debug-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debug agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web UI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Web UI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/schedules-and-limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schedules & limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/web-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/app-policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    App policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/access-requests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Access requests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/child-accounts-and-mappings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Child accounts & mappings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/device-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web-ui/install-pwa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install PWA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/pairing-and-approval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pairing & approval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/policy-assignment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy assignment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/cloud-console-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud console setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/unenroll-and-factory-reset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unenroll & factory reset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Features
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/app-discovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    App discovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/screenshots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Screenshots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/device-restrictions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device restrictions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/browser-restrictions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Browser restrictions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/web-video-history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web & video history
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/alerts-and-webhooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alerts & webhooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/registration-approvals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Site registration approvals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/policy-presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/guardian-overlay/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guardian Space overlay
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/policy-matrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/websocket-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/rest-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/background-worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background worker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/auth-and-oidc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Auth & OIDC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../assets/images/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/local-dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/ci-release/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI & releases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#battery-efficient-connectivity-fcm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battery-efficient connectivity (FCM)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Battery-efficient connectivity (FCM)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#server-fcm-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server FCM configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#screen-time-lockout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Screen time lockout
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Screen time lockout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phone-exemption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phone exemption
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#future-screentime-whitelist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future screentime whitelist
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pairing-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pairing flows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pairing flows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-app-pairing-qr-installed-apk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In-app pairing QR (installed APK)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#android-mdm-provisioning-qr-factory-reset-6-tap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Android MDM provisioning QR (factory-reset / 6-tap)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Android MDM provisioning QR (factory-reset / 6-tap)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#release-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generating-and-encoding-the-keystore-for-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generating and Encoding the Keystore for CI/CD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#required-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required permissions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-user-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-user support
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multi-user support">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-device-owner-do-requirement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Device Owner (DO) Requirement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provisioning-device-owner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provisioning Device Owner
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provisioning Device Owner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#method-a-mdmandroid-enterprise-qr-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method A: MDM/Android Enterprise QR (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#method-b-adb-android-debug-bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method B: ADB (Android Debug Bridge)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-user-management-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-User Management Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domain-block-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain block notifications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-approvals-app-launch-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access approvals (app launch + domains)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Access approvals (app launch + domains)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app-launch-sync_apparmor_policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        App launch (sync_apparmor_policy)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domain-access-update_domain_policy_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain access (update_domain_policy_manifest)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-restrictions-sync_android_device_policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device restrictions (sync_android_device_policy)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-unenrollment-and-factory-reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device unenrollment and factory reset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app-policies-on-android" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        App policies on Android
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installed-application-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installed application inventory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anti-bypass-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anti-bypass hardening
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Versioning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Versioning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automatic updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/pantherale0/timekpr-webui/edit/master/docs/platforms/android-agent.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="android-agent">Android agent<a class="headerlink" href="#android-agent" title="Permanent link">&para;</a></h1>
+<p>The Android agent (<code>android-agent/</code>) is a Kotlin port of the Rust Linux client. It connects to the same Flask WebSocket hub (<code>/ws</code>), uses the identical JSON protocol, and enforces policies using Android-native APIs.</p>
+<h2 id="battery-efficient-connectivity-fcm">Battery-efficient connectivity (FCM)<a class="headerlink" href="#battery-efficient-connectivity-fcm" title="Permanent link">&para;</a></h2>
+<p>Android does <strong>not</strong> keep a WebSocket open 24/7. That would drain the battery quickly.</p>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FCM data message</strong></td>
+<td>Server pushes <code>sync_policies</code>, <code>command_wake</code>, <code>factory_reset</code>, or <code>pairing_approved</code> → app runs a <strong>short WebSocket session</strong> (connect, sync, disconnect) or wipes immediately for <code>factory_reset</code></td>
+</tr>
+<tr>
+<td><strong>WorkManager</strong></td>
+<td>Periodic sync every 4 hours (matches Linux agent policy timer)</td>
+</tr>
+<tr>
+<td><strong>Pairing poll</strong></td>
+<td>Every 15 minutes while unpaired (replaces holding WS open during approval)</td>
+</tr>
+<tr>
+<td><strong>User / boot</strong></td>
+<td>Manual reconnect or startup schedules an expedited sync</td>
+</tr>
+</tbody>
+</table>
+<p>Linux agents remain on a persistent WebSocket. Android registers <code>fcm_token</code> + <code>platform: android</code> in <code>hello</code>; the server stores the token and uses FCM when the device is offline.</p>
+<h3 id="server-fcm-configuration">Server FCM configuration<a class="headerlink" href="#server-fcm-configuration" title="Permanent link">&para;</a></h3>
+<p>Set one of:</p>
+<ul>
+<li><code>FCM_SERVER_KEY</code> — legacy HTTP API server key</li>
+<li><code>FIREBASE_CREDENTIALS_JSON</code> — path or inline JSON for a Firebase service account (HTTP v1 API)</li>
+</ul>
+<p>Optional: <code>FIREBASE_PROJECT_ID</code> when using service account JSON without <code>project_id</code>.</p>
+<p>Copy <code>android-agent/app/google-services.json.example</code> → <code>google-services.json</code> from the Firebase console.</p>
+<h2 id="architecture-mapping">Architecture mapping<a class="headerlink" href="#architecture-mapping" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Linux Rust agent</th>
+<th>Android agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TimeKpr D-Bus (<code>timekpr_dbus.rs</code>)</td>
+<td><code>TimeLimitStore</code> + <code>UsageMonitorService</code> (local screen-time state)</td>
+</tr>
+<tr>
+<td>AppArmor profiles (<code>apparmor.rs</code>)</td>
+<td><code>AppPolicyStore</code> + Device Admin <code>setPackagesSuspended</code></td>
+</tr>
+<tr>
+<td>iptables + local DNS (<code>firewall.rs</code>, <code>local_dns.rs</code>)</td>
+<td><code>DomainBlockVpnService</code> (VPN tunnel with DNS filtering)</td>
+</tr>
+<tr>
+<td>Netlink process monitor (<code>netlink.rs</code>)</td>
+<td><code>UsageStatsManager</code> event stream</td>
+</tr>
+<tr>
+<td><code>/etc/guardian-agent/config.json</code></td>
+<td><code>AgentConfigStore</code> (EncryptedSharedPreferences-ready SharedPreferences)</td>
+</tr>
+<tr>
+<td>logind session alerts</td>
+<td><code>user_signed_in</code> / <code>app_usage</code> alerts via usage events (secondary profiles forward alerts to user 0)</td>
+</tr>
+<tr>
+<td>Persistent WebSocket loop</td>
+<td>FCM wake + ephemeral <code>AgentWebSocketClient</code> sessions</td>
+</tr>
+</tbody>
+</table>
+<h2 id="screen-time-lockout">Screen time lockout<a class="headerlink" href="#screen-time-lockout" title="Permanent link">&para;</a></h2>
+<p>When daily time is exhausted or the current hour falls outside allowed windows (<code>TimeLimitStore.isAccessAllowed()</code>), the agent <strong>does not</strong> lock the device screen. Instead:</p>
+<ol>
+<li>A <strong>persistent top banner</strong> (<code>TimeExhaustedOverlay</code>) informs the user that screen time is used up.</li>
+<li>All launcher apps are <strong>suspended</strong> via Device Admin <code>setPackagesSuspended</code>, except packages in the exempt set.</li>
+<li>When access is restored (parent adds time, schedule changes, etc.), the banner is dismissed and suspensions from the lockout are cleared; normal app-policy suspensions remain.</li>
+</ol>
+<h3 id="phone-exemption">Phone exemption<a class="headerlink" href="#phone-exemption" title="Permanent link">&para;</a></h3>
+<p>On devices with telephony and an <strong>active SIM</strong> (<code>READ_PHONE_STATE</code> + <code>TelephonyManager.SIM_STATE_READY</code>):</p>
+<ul>
+<li>The default dialer and in-call UI packages stay unsuspended so calls can be placed and received.</li>
+<li>The overlay shows a <strong>Make a call</strong> button that opens the system dialer.</li>
+</ul>
+<p>Tablets and phones without a ready SIM get banner-only lockout with all apps suspended.</p>
+<h3 id="future-screentime-whitelist">Future screentime whitelist<a class="headerlink" href="#future-screentime-whitelist" title="Permanent link">&para;</a></h3>
+<p><code>TimeLimitStore.screentimeExemptPackages()</code> holds packages that may run regardless of screen-time limits (for example, educational apps on a tablet). The set is persisted locally and empty by default; a future server command will populate it. Whitelisted packages use the same exempt-package path as the dialer on phones.</p>
+<p>Server screen-time inputs are unchanged: <code>set_weekly_time_limits</code>, <code>set_allowed_hours</code>, and <code>modify_time_left</code>.</p>
+<h2 id="pairing-flows">Pairing flows<a class="headerlink" href="#pairing-flows" title="Permanent link">&para;</a></h2>
+<p>TimeKpr supports two Android enrollment paths. Both end with admin approval in <strong>Admin → Devices</strong> and a <code>pairing_approved</code> WebSocket message.</p>
+<h3 id="in-app-pairing-qr-installed-apk">In-app pairing QR (installed APK)<a class="headerlink" href="#in-app-pairing-qr-installed-apk" title="Permanent link">&para;</a></h3>
+<p>Use when the APK is already on the device (sideload, adb install, or manual download).</p>
+<ol>
+<li>Open <strong>Settings → Agent pairing</strong> in the TimeKpr WebUI.</li>
+<li>On the phone, open the app and tap <strong>Scan server QR code</strong> (or complete first-run setup).</li>
+<li>The app stores <code>server_url</code> and <code>registration_token</code> (household enrollment or global <code>REGISTRATION_TOKEN</code>) then opens a WebSocket <code>hello</code>.</li>
+<li>Approve the pending device in <strong>Admin → Devices</strong>.</li>
+<li>The server issues <code>pairing_approved</code> when the client presents a valid enrollment token (required if the app reconnects with <code>paired: false</code>); the app stores the per-device token and reconnects with HMAC auth.</li>
+</ol>
+<p>Payload schema:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;timekpr_pairing&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;server_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wss://your-server.example/ws&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;registration_token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;household-enrollment-or-global-token&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="android-mdm-provisioning-qr-factory-reset-6-tap">Android MDM provisioning QR (factory-reset / 6-tap)<a class="headerlink" href="#android-mdm-provisioning-qr-factory-reset-6-tap" title="Permanent link">&para;</a></h3>
+<p>Use for zero-touch device-owner rollout on a factory-reset device. The QR follows <a href="https://developers.google.com/android/management/provision-device#about_qr_codes">Android Enterprise provisioning</a> and installs the agent automatically.</p>
+<ol>
+<li>Open <strong>Settings → Agent pairing → Android MDM provisioning QR</strong> in the WebUI.</li>
+<li>On a factory-reset device, tap the welcome screen six times and scan the MDM QR.</li>
+<li>Android downloads the APK, sets <code>com.guardian.agent</code> as device owner, and applies the server URL from admin extras.</li>
+<li>Approve the pending device in <strong>Admin → Devices</strong> (same as in-app pairing).</li>
+</ol>
+<p>The server emits standard <code>android.app.extra.PROVISIONING_*</code> keys. Admin extras use:</p>
+<ul>
+<li><code>com.guardian.agent.EXTRA_SERVER_URL</code></li>
+<li><code>com.guardian.agent.EXTRA_REGISTRATION_TOKEN</code> (optional)</li>
+</ul>
+<h4 id="release-servers">Release servers<a class="headerlink" href="#release-servers" title="Permanent link">&para;</a></h4>
+<p>When <code>TIMEKPR_SERVER_VERSION</code> matches a GitHub release tag (e.g. <code>v1.2.3</code>), the WebUI defaults to:</p>
+<ul>
+<li>APK: <code>https://github.com/pantherale0/timekpr-webui/releases/download/{tag}/guardian-android-agent-{tag}.apk</code></li>
+<li>Checksum: companion <code>guardian-android-agent-{tag}.signature-checksum</code> asset</li>
+</ul>
+<h4 id="development-servers">Development servers<a class="headerlink" href="#development-servers" title="Permanent link">&para;</a></h4>
+<p>When the server runs as <code>v0.0.0-dev</code>, no release assets exist. Build a <strong>release</strong> APK locally and upload it in <strong>Settings → Android MDM provisioning QR</strong>. The server stores the file, serves it at <code>/api/pairing/provisioning/apk</code> (admin login required), and computes the signature checksum automatically (requires <code>apksigner</code> in <code>ANDROID_HOME</code> or <code>~/Android/Sdk/build-tools</code> on the server host).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>android-agent
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>./gradlew<span class="w"> </span>assembleRelease
+</code></pre></div>
+<p>Release CI publishes the checksum asset when these GitHub Actions secrets are configured:</p>
+<ul>
+<li><code>ANDROID_KEYSTORE_BASE64</code></li>
+<li><code>ANDROID_KEYSTORE_PASSWORD</code></li>
+<li><code>ANDROID_KEY_ALIAS</code></li>
+<li><code>ANDROID_KEY_PASSWORD</code></li>
+</ul>
+<h3 id="generating-and-encoding-the-keystore-for-cicd">Generating and Encoding the Keystore for CI/CD<a class="headerlink" href="#generating-and-encoding-the-keystore-for-cicd" title="Permanent link">&para;</a></h3>
+<p>To generate a keystore and convert it to Base64 for GitHub Secrets:</p>
+<ol>
+<li>
+<p><strong>Generate the Keystore File</strong>:
+   Use Java's <code>keytool</code> to generate a new key pair in a keystore:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>keytool<span class="w"> </span>-genkeypair<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>-keystore<span class="w"> </span>release.keystore<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-alias<span class="w"> </span>timekpr-alias<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>-keyalg<span class="w"> </span>RSA<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span>-keysize<span class="w"> </span><span class="m">2048</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span>-validity<span class="w"> </span><span class="m">10000</span>
+</code></pre></div>
+   Provide a keystore password and key password when prompted.</p>
+</li>
+<li>
+<p><strong>Encode the Keystore File to Base64</strong>:
+   Convert the generated binary <code>.keystore</code> file to a single Base64-encoded string:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>base64<span class="w"> </span>-w<span class="w"> </span><span class="m">0</span><span class="w"> </span>release.keystore<span class="w"> </span>&gt;<span class="w"> </span>keystore_base64.txt
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Configure the GitHub Repository Secrets</strong>:</p>
+</li>
+<li><code>ANDROID_KEYSTORE_BASE64</code>: Paste the entire content of <code>keystore_base64.txt</code>.</li>
+<li><code>ANDROID_KEYSTORE_PASSWORD</code>: The password you set for the keystore.</li>
+<li><code>ANDROID_KEY_ALIAS</code>: The alias you used (e.g., <code>timekpr-alias</code>).</li>
+<li><code>ANDROID_KEY_PASSWORD</code>: The password you set for the specific key alias.</li>
+</ol>
+<p>Local release signing uses the same variables via <code>ANDROID_KEYSTORE_PATH</code> or <code>android.keystore.*</code> Gradle properties.</p>
+<h2 id="required-permissions">Required permissions<a class="headerlink" href="#required-permissions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Permission / API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Background connection</td>
+<td>Foreground service (<code>AgentWebSocketService</code>)</td>
+</tr>
+<tr>
+<td>Screen time enforcement</td>
+<td>Device Admin (<code>GuardianDeviceAdminReceiver</code>)</td>
+</tr>
+<tr>
+<td>App usage monitoring</td>
+<td><code>PACKAGE_USAGE_STATS</code> (Usage Access)</td>
+</tr>
+<tr>
+<td>Installed app inventory</td>
+<td><code>PackageManager</code> (launcher-visible apps; no extra permission beyond normal install visibility)</td>
+</tr>
+<tr>
+<td>Web/domain policies</td>
+<td><code>VpnService</code> consent</td>
+</tr>
+<tr>
+<td>Boot persistence</td>
+<td><code>RECEIVE_BOOT_COMPLETED</code></td>
+</tr>
+</tbody>
+</table>
+<p>For full MDM-style control, provision the app as <strong>Device Owner</strong> using the MDM provisioning QR above, your EMM, or:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>adb<span class="w"> </span>dpm<span class="w"> </span>set-device-owner<span class="w"> </span>com.guardian.agent/com.guardian.agent.admin.GuardianDeviceAdminReceiver
+</code></pre></div>
+<p>The agent implements Android 12+ provisioning handlers (<code>GET_PROVISIONING_MODE</code>, <code>ADMIN_POLICY_COMPLIANCE</code>) for QR-based device-owner enrollment. During provisioning the app prompts for <strong>Single-User</strong> vs <strong>Multi-User</strong> management mode, stages the server URL from the QR, and returns control to the setup wizard so the user can still add a Google account and complete OEM setup steps. On Android 11 and below, the same management-mode screen appears on first app launch after QR provisioning.</p>
+<p>When device owner, the app auto-grants itself Usage Access, overlay (<code>SYSTEM_ALERT_WINDOW</code>), and notification permission (Android 13+) via <code>DevicePolicyManager</code> — no manual Settings taps required. Always-on VPN is enabled only when domain block policies are active. Device Admin alone still needs the user to approve Usage Access and VPN in system settings.</p>
+<h2 id="multi-user-support">Multi-user support<a class="headerlink" href="#multi-user-support" title="Permanent link">&para;</a></h2>
+<p>Android allows multiple user profiles (e.g. secondary users, guests, restricted profiles) to run on a single device. TimeKpr Android Agent supports managing these secondary profiles from a single installation running under the primary user account (User 0).</p>
+<h3 id="the-device-owner-do-requirement">The Device Owner (DO) Requirement<a class="headerlink" href="#the-device-owner-do-requirement" title="Permanent link">&para;</a></h3>
+<p>Due to Android security restrictions, standard <strong>Device Admin (DA)</strong> applications are sandboxed and cannot view or manage other profiles on the system. Attempting to query secondary users on a standard Device Admin install causes Android to throw a <code>SecurityException</code>, falling back to returning only the current user profile (User 0).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>To discover, monitor, and enforce rules on secondary user profiles (e.g., child profiles on a shared tablet), the agent app <strong>must</strong> be provisioned as <strong>Device Owner (DO)</strong>.</p>
+</div>
+<h3 id="provisioning-device-owner">Provisioning Device Owner<a class="headerlink" href="#provisioning-device-owner" title="Permanent link">&para;</a></h3>
+<h4 id="method-a-mdmandroid-enterprise-qr-recommended">Method A: MDM/Android Enterprise QR (Recommended)<a class="headerlink" href="#method-a-mdmandroid-enterprise-qr-recommended" title="Permanent link">&para;</a></h4>
+<p>This is the cleanest method, performed during initial device setup.
+1. Perform a factory reset on the target device.
+2. At the welcome screen, tap anywhere on the screen 6 times to launch the QR code reader.
+3. Scan the MDM provisioning QR code from the WebUI (<strong>Settings → Agent pairing → Android MDM provisioning QR</strong>).
+4. The system automatically installs the agent and configures it as Device Owner.</p>
+<h4 id="method-b-adb-android-debug-bridge">Method B: ADB (Android Debug Bridge)<a class="headerlink" href="#method-b-adb-android-debug-bridge" title="Permanent link">&para;</a></h4>
+<p>If the device is already set up and you do not want to perform a factory reset, you can set the Device Owner via ADB:</p>
+<ol>
+<li>Enable <strong>Developer Options</strong> and <strong>USB Debugging</strong> on the target device.</li>
+<li>Connect the device to your computer and run the following command:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>adb<span class="w"> </span>shell<span class="w"> </span>dpm<span class="w"> </span>set-device-owner<span class="w"> </span>com.guardian.agent/com.guardian.agent.admin.GuardianDeviceAdminReceiver
+</code></pre></div></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">ADB Device Owner blockers</p>
+<p>Android forbids setting Device Owner via ADB when accounts or extra users exist. Common errors:</p>
+<ul>
+<li><code>Not allowed to set the device owner because there are already some accounts</code></li>
+<li><code>Not allowed to set the device owner because there are already several users on the device</code></li>
+</ul>
+<p>To use ADB provisioning you must temporarily remove all accounts on User 0 <strong>and</strong> remove secondary users, then run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>adb<span class="w"> </span>shell<span class="w"> </span>dpm<span class="w"> </span>set-device-owner<span class="w"> </span>com.guardian.agent/com.guardian.agent.admin.GuardianDeviceAdminReceiver
+</code></pre></div>
+<p>Re-add accounts and recreate child profiles <strong>after</strong> Device Owner is set. See <a href="../../troubleshooting/#android-multi-user-and-device-owner">Troubleshooting</a>.</p>
+</div>
+<h3 id="multi-user-management-workflow">Multi-User Management Workflow<a class="headerlink" href="#multi-user-management-workflow" title="Permanent link">&para;</a></h3>
+<p>Once the agent has Device Owner status and is running:
+1. <strong>User Setup</strong>: Create the secondary user profiles on the Android device (e.g., through <strong>Settings → System → Multiple users</strong>).
+2. <strong>Pairing</strong>: Initiate the pairing flow on the agent app under User 0.
+3. <strong>Discovery</strong>: The agent queries the list of secondary users via <code>DevicePolicyManager.getSecondaryUsers()</code> and packages them in the connection handshake.
+4. <strong>Approval</strong>: Go to the server WebUI (<strong>Admin → Devices</strong>) to approve the pending device.
+5. <strong>Mapping</strong>: On the server, the discovered Android user profiles will appear under the device configuration. You can map each Android profile to a corresponding TimeKpr user/child account to enforce distinct daily time limits and restrictions.</p>
+<h2 id="domain-block-notifications">Domain block notifications<a class="headerlink" href="#domain-block-notifications" title="Permanent link">&para;</a></h2>
+<p>When the DNS VPN blocks a domain, the agent shows deduplicated user feedback:</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>UI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single blocked domain (e.g. <code>facebook.com</code>)</td>
+<td>Small overlay card on top of the current app</td>
+</tr>
+<tr>
+<td>Burst / ad-list (≥3 blocks or ≥2 distinct domains in 10s)</td>
+<td>One notification: <em>"Some traffic on this website has been blocked"</em> (auto-dismisses after 10s)</td>
+</tr>
+</tbody>
+</table>
+<p>Rules:</p>
+<ul>
+<li>No UI when the screen is off</li>
+<li>10s cooldown after any alert (DNS retries for the same domain are collapsed)</li>
+<li>Overlay requires <code>SYSTEM_ALERT_WINDOW</code> (auto-granted on device owner); sideloaded installs without overlay permission get a heads-up notification instead</li>
+</ul>
+<p>Implementation: <code>BlockNotificationCoordinator</code> in the VPN service, <code>BlockedDomainOverlay</code> for single blocks, <code>BlockBurstNotifier</code> for bursts.</p>
+<h2 id="access-approvals-app-launch-domains">Access approvals (app launch + domains)<a class="headerlink" href="#access-approvals-app-launch-domains" title="Permanent link">&para;</a></h2>
+<p>When a child profile uses approval modes on the server, the Android agent consumes additive sync fields and emits parent-review alerts.</p>
+<h3 id="app-launch-sync_apparmor_policy">App launch (<code>sync_apparmor_policy</code>)<a class="headerlink" href="#app-launch-sync_apparmor_policy" title="Permanent link">&para;</a></h3>
+<p>When <code>app_launch_mode</code> is <code>allowlist</code> or <code>blocklist</code>, the server includes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;policies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">],</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;approval_policy&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">&quot;app_launch_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;allowlist&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">&quot;approved_packages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;com.approved.app&quot;</span><span class="p">],</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">&quot;blocked_packages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;com.unapproved.app&quot;</span><span class="p">]</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
+</code></pre></div>
+<p>The agent suspends packages from <code>blocked_packages</code> (server-precomputed). When <code>approval_policy</code> is omitted (<code>open</code> mode), only static <code>blocked</code> rules from <code>policies</code> apply.</p>
+<p>On blocked launch under an approval overlay, the agent emits <code>access_requested</code> (and <code>app_blocked</code> with <code>reason: not_approved</code> as fallback).</p>
+<h3 id="domain-access-update_domain_policy_manifest">Domain access (<code>update_domain_policy_manifest</code>)<a class="headerlink" href="#domain-access-update_domain_policy_manifest" title="Permanent link">&para;</a></h3>
+<p>Per-UID manifest entries may include:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;linux_username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;child&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;source_ids&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;domain_access_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;approval_on_block&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;allowed_domains&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;wikipedia.org&quot;</span><span class="p">]</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>Granted domains bypass the DNS VPN block. When <code>domain_access_mode</code> is <code>approval_on_block</code>, blocked domains show a <strong>Request access</strong> overlay button and emit <code>access_requested</code> alerts (rate-limited on device).</p>
+<p>FCM <code>sync_policies</code> wakes a short WebSocket session; policy JSON is delivered via existing sync commands, not in the FCM payload.</p>
+<h2 id="device-restrictions-sync_android_device_policy">Device restrictions (<code>sync_android_device_policy</code>)<a class="headerlink" href="#device-restrictions-sync_android_device_policy" title="Permanent link">&para;</a></h2>
+<p>Per Android device mapping, the admin UI can configure AMAPI-aligned device restriction fields. The server pushes them via <code>sync_android_device_policy</code> (on save, and again when the agent reconnects after an FCM <code>sync_policies</code> wake).</p>
+<p>Payload shape (field names match <a href="https://developers.google.com/android/management/reference/rest/v1/enterprises.policies">Android Management API Policy</a>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;device_policy&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">&quot;screenCaptureDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nt">&quot;cameraAccess&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CAMERA_ACCESS_DISABLED&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">&quot;microphoneAccess&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MICROPHONE_ACCESS_DISABLED&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="nt">&quot;installAppsDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="nt">&quot;uninstallAppsDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="nt">&quot;factoryResetDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="nt">&quot;adjustVolumeDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="nt">&quot;modifyAccountsDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="nt">&quot;mountPhysicalMediaDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="nt">&quot;bluetoothDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">    </span><span class="nt">&quot;outgoingCallsDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="nt">&quot;smsDisabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="nt">&quot;advancedSecurityOverrides&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">      </span><span class="nt">&quot;developerSettings&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DEVELOPER_SETTINGS_DISABLED&quot;</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">    </span><span class="nt">&quot;deviceConnectivityManagement&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">      </span><span class="nt">&quot;usbDataAccess&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DISALLOW_USB_FILE_TRANSFER&quot;</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">    </span><span class="nt">&quot;shortSupportMessage&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">      </span><span class="nt">&quot;defaultMessage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;This setting is managed by your parent through TimeKpr.&quot;</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">    </span><span class="nt">&quot;longSupportMessage&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">      </span><span class="nt">&quot;defaultMessage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;This device is protected by TimeKpr parental controls. Your parent manages screen time, apps, and websites. Ask them if you need something changed.&quot;</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="p">}</span>
+</code></pre></div>
+<p>Supported <code>cameraAccess</code> values: <code>CAMERA_ACCESS_UNSPECIFIED</code>, <code>CAMERA_ACCESS_DISABLED</code>, <code>CAMERA_ACCESS_USER_CHOICE</code>, <code>CAMERA_ACCESS_ENFORCED</code>.</p>
+<p>Supported <code>microphoneAccess</code> values: <code>MICROPHONE_ACCESS_UNSPECIFIED</code>, <code>MICROPHONE_ACCESS_DISABLED</code>, <code>MICROPHONE_ACCESS_USER_CHOICE</code>, <code>MICROPHONE_ACCESS_ENFORCED</code>.</p>
+<p>Supported <code>usbDataAccess</code> values (under <code>deviceConnectivityManagement</code>): <code>USB_DATA_ACCESS_UNSPECIFIED</code>, <code>ALLOW_USB_DATA_TRANSFER</code>, <code>DISALLOW_USB_FILE_TRANSFER</code>, <code>DISALLOW_USB_DATA_TRANSFER</code>.</p>
+<p>Supported <code>developerSettings</code> values: <code>DEVELOPER_SETTINGS_UNSPECIFIED</code>, <code>DEVELOPER_SETTINGS_DISABLED</code>, <code>DEVELOPER_SETTINGS_ALLOWED</code>.</p>
+<p><code>shortSupportMessage</code> and <code>longSupportMessage</code> use AMAPI <code>UserFacingMessage</code> objects (<code>defaultMessage</code> string). Defaults are parental-controls wording, not enterprise/work policy text:</p>
+<ul>
+<li>Short: <em>"This setting is managed by your parent through TimeKpr."</em></li>
+<li>Long: <em>"This device is protected by TimeKpr parental controls…"</em></li>
+</ul>
+<p>Parents can customize both messages per Android device mapping in the admin UI. The agent applies them via <code>DevicePolicyManager.setShortSupportMessage()</code> / <code>setLongSupportMessage()</code>.</p>
+<p>Enforcement uses <code>DevicePolicyManager</code> and requires <strong>device owner</strong> provisioning. Device-admin-only installs show a warning in the admin UI and skip most restrictions.</p>
+<h2 id="device-unenrollment-and-factory-reset">Device unenrollment and factory reset<a class="headerlink" href="#device-unenrollment-and-factory-reset" title="Permanent link">&para;</a></h2>
+<p>Admins can remove devices from family management from the device detail page or devices list.</p>
+<table>
+<thead>
+<tr>
+<th>Command / FCM action</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unenroll</code></td>
+<td>Stops enforcement, clears VPN/usage monitoring, clears stored agent token and pairing state via <code>AgentConfigStore.clearEnrollmentState()</code>. Server revokes trust (<code>status=rejected</code>).</td>
+</tr>
+<tr>
+<td><code>factory_reset</code> (WebSocket)</td>
+<td>Requires <strong>device owner</strong>. Calls <code>DevicePolicyManager.wipeData(admin, 0)</code>.</td>
+</tr>
+<tr>
+<td><code>factory_reset</code> (FCM)</td>
+<td>Immediate wipe on a background thread without waiting for a full policy sync cycle.</td>
+</tr>
+</tbody>
+</table>
+<p><code>device_admin.xml</code> declares <code>&lt;wipe-data /&gt;</code> so device-owner agents can perform remote wipes.</p>
+<p>If a factory reset is requested while the device is offline, the server sets <code>pending_factory_reset</code> on the <code>AgentDevice</code> row, revokes management trust, and retries delivery on the next WebSocket connection (FCM <code>factory_reset</code> is also sent when an FCM token is available).</p>
+<p>Linux agents handle <code>unenroll</code> by clearing <code>/etc/guardian-agent/config.json</code> agent token and stopping the reconnect loop. Linux has no remote factory reset.</p>
+<h2 id="app-policies-on-android">App policies on Android<a class="headerlink" href="#app-policies-on-android" title="Permanent link">&para;</a></h2>
+<p>Server AppArmor rules sync to the agent via <code>sync_apparmor_policy</code>. Use either:</p>
+<ul>
+<li><code>match_type: "package"</code> with <code>executable_path: "com.example.app"</code>, or</li>
+<li><code>executable_path: "/android/package/com.example.app"</code> (legacy-compatible prefix)</li>
+</ul>
+<p>Presets:</p>
+<ul>
+<li><code>blocked</code> → package suspended + launch blocked</li>
+<li><code>no_internet</code> → tracked for future per-app network rules (domain VPN still applies globally)</li>
+<li><code>complain</code> → usage alerts without blocking</li>
+</ul>
+<h2 id="installed-application-inventory">Installed application inventory<a class="headerlink" href="#installed-application-inventory" title="Permanent link">&para;</a></h2>
+<p>After each authenticated sync session the agent scans launcher-visible packages <strong>for every managed Android user</strong> (device owner on user 0 reports owner + secondary profiles via cross-user <code>PackageManager</code> contexts) and sends chunked <code>installed_apps_report</code> messages per <code>linux_username</code>, plus optional <code>app_icon_report</code> PNG uploads (64×64, content-addressed). The server uses this inventory in the application policies UI.</p>
+<p>The agent also handles <code>refresh_installed_apps</code> RPC for on-demand rescans of a specific mapped profile while connected.</p>
+<p>See <a href="../../features/app-discovery/">App discovery</a> for the full protocol reference.</p>
+<h2 id="anti-bypass-hardening">Anti-bypass hardening<a class="headerlink" href="#anti-bypass-hardening" title="Permanent link">&para;</a></h2>
+<p>Known Android parental-control bypass techniques and Guardian's coverage are documented in the <a href="../android-bypasses/">Android bypass matrix</a>. Medium/high <a href="../../features/policy-presets/">policy presets</a> apply the recommended device restrictions and anti-bypass app blocks automatically.</p>
+<h2 id="building">Building<a class="headerlink" href="#building" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span><span class="w"> </span>android-agent
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>./gradlew<span class="w"> </span>assembleDebug<span class="w">      </span><span class="c1"># local testing</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>./gradlew<span class="w"> </span>assembleRelease<span class="w">    </span><span class="c1"># MDM QR provisioning (requires release signing)</span>
+</code></pre></div>
+<p>Set <code>TIMEKPR_AGENT_WS_URL</code> on the server when behind reverse proxies so QR codes embed the public WebSocket URL.</p>
+<p>Debug APKs cannot be used for MDM QR provisioning; always use a signed release build and matching signature checksum.</p>
+<p>Release CI stamps the agent version from the git tag, matching the Rust agent and server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">TIMEKPR_AGENT_VERSION</span><span class="o">=</span>v1.2.3
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>./gradlew<span class="w"> </span>assembleRelease
+</code></pre></div>
+<h2 id="versioning">Versioning<a class="headerlink" href="#versioning" title="Permanent link">&para;</a></h2>
+<p>The Android agent reports <code>agent_version</code> from <code>TIMEKPR_AGENT_VERSION</code> at build time (<code>v0.0.0-dev</code> for debug builds, e.g. <code>v1.2.3</code> for tagged release builds). Release agents must match <code>TIMEKPR_SERVER_VERSION</code>; dev servers (<code>v0.0.0-dev</code>) accept any agent version.</p>
+<h3 id="automatic-updates">Automatic updates<a class="headerlink" href="#automatic-updates" title="Permanent link">&para;</a></h3>
+<p>When a release server rejects a mismatched <code>agent_version</code> at WebSocket <code>hello</code>, it responds with <code>auth_result</code> containing:</p>
+<ul>
+<li><code>update_required: true</code></li>
+<li><code>target_version</code> — the server's <code>TIMEKPR_SERVER_VERSION</code></li>
+<li><code>apk_url</code> — GitHub release APK or server-uploaded dev APK URL</li>
+<li><code>signature_checksum</code> — signing certificate checksum for verification</li>
+<li><code>update_available</code> — whether both URL and checksum are available</li>
+</ul>
+<p>The Android agent handles this automatically:</p>
+<ol>
+<li>Downloads the APK (from server-provided URL, or GitHub release fallback for older servers)</li>
+<li>Verifies the APK signing certificate checksum (same format as MDM provisioning QR)</li>
+<li>Installs via <code>PackageInstaller</code> (silent when device owner; may prompt on sideload-only installs per Android platform rules)</li>
+<li>Reconnects after install via <code>PACKAGE_REPLACED</code> / install callback</li>
+</ol>
+<p><strong>Release servers:</strong> APK from <code>https://github.com/pantherale0/timekpr-webui/releases/download/{tag}/guardian-android-agent-{tag}.apk</code> with companion <code>.signature-checksum</code> asset.</p>
+<p><strong>Development servers:</strong> Upload a signed release APK in <strong>Settings → Android MDM provisioning QR</strong>; the server serves it at <code>/api/pairing/provisioning/apk</code> (admin session required) and includes that URL in the update response.</p>
+<p>If <code>update_available</code> is false (dev server without uploaded APK), the agent shows the server error message and retries on the next sync cycle.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/pantherale0/timekpr-webui" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.indexes", "content.code.copy", "content.action.edit", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
