@@ -7,6 +7,7 @@ import os
 import time
 
 from src.common.oidc import OIDCRefreshError
+from src.auth.oidc_token_refresh import refresh_oidc_tokens
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ def extend_parent_session(session, oidc_helper) -> tuple[bool, str | None]:
         return True, None
 
     try:
-        new_tokens = oidc_helper.refresh_access_token(refresh_token)
+        new_tokens = refresh_oidc_tokens(oidc_helper, refresh_token)
         session['oidc_access_token'] = new_tokens.get('access_token')
         if new_tokens.get('refresh_token'):
             session['oidc_refresh_token'] = new_tokens.get('refresh_token')
@@ -63,7 +64,13 @@ def extend_parent_session(session, oidc_helper) -> tuple[bool, str | None]:
         if exc.is_transient:
             _LOGGER.warning('Transient OIDC refresh failure during session extend: %s', exc)
             return False, 'session_extend_transient'
-        _LOGGER.error('Definitive OIDC refresh failure during session extend: %s', exc)
+        _LOGGER.info(
+            'Definitive OIDC refresh failure during session extend '
+            '(status=%s, oauth_error=%s): %s',
+            exc.status_code,
+            exc.oauth_error,
+            exc,
+        )
         return False, 'session_extend_failed'
     except Exception as exc:
         _LOGGER.warning('Unexpected error during session extend: %s', exc)

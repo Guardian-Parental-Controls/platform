@@ -140,7 +140,7 @@ def test_oidc_session_token_refresh(client, db_session):
             sess['oidc_refresh_token'] = 'refresh-token-xyz'
             sess['oidc_token_expires_at'] = time.time() + 300  # 5 minutes in future
 
-        with patch('src.common.oidc.OIDCHelper.refresh_access_token') as mock_refresh:
+        with patch('src.auth.oidc_token_refresh.refresh_oidc_tokens') as mock_refresh:
             res = client.get('/dashboard')
             assert res.status_code == 200
             mock_refresh.assert_not_called()
@@ -153,7 +153,7 @@ def test_oidc_session_token_refresh(client, db_session):
             sess['oidc_refresh_token'] = 'refresh-token-xyz'
             sess['oidc_token_expires_at'] = time.time() - 10  # expired
 
-        with patch('src.common.oidc.OIDCHelper.refresh_access_token') as mock_refresh:
+        with patch('src.auth.oidc_token_refresh.refresh_oidc_tokens') as mock_refresh:
             mock_refresh.return_value = {
                 'access_token': 'new-access-token-abc',
                 'refresh_token': 'new-refresh-token-123',
@@ -161,7 +161,8 @@ def test_oidc_session_token_refresh(client, db_session):
             }
             res = client.get('/dashboard')
             assert res.status_code == 200
-            mock_refresh.assert_called_once_with('refresh-token-xyz')
+            mock_refresh.assert_called_once()
+            assert mock_refresh.call_args.args[1] == 'refresh-token-xyz'
             
             with client.session_transaction() as sess:
                 assert sess['oidc_access_token'] == 'new-access-token-abc'
@@ -177,7 +178,7 @@ def test_oidc_session_token_refresh(client, db_session):
             sess['oidc_refresh_token'] = 'refresh-token-xyz'
             sess['oidc_token_expires_at'] = time.time() - 10  # expired
 
-        with patch('src.common.oidc.OIDCHelper.refresh_access_token') as mock_refresh:
+        with patch('src.auth.oidc_token_refresh.refresh_oidc_tokens') as mock_refresh:
             mock_refresh.side_effect = OIDCRefreshError("Revoked", is_transient=False, status_code=400)
             res = client.get('/dashboard', follow_redirects=False)
             assert res.status_code == 302
@@ -196,7 +197,7 @@ def test_oidc_session_token_refresh(client, db_session):
             sess['oidc_refresh_token'] = 'refresh-token-xyz'
             sess['oidc_token_expires_at'] = time.time() - 10  # expired
 
-        with patch('src.common.oidc.OIDCHelper.refresh_access_token') as mock_refresh:
+        with patch('src.auth.oidc_token_refresh.refresh_oidc_tokens') as mock_refresh:
             mock_refresh.side_effect = OIDCRefreshError("Revoked", is_transient=False, status_code=400)
             res = client.get('/api/device/approve/sys-1')  # API path
             assert res.status_code == 401
@@ -213,7 +214,7 @@ def test_oidc_session_token_refresh(client, db_session):
             sess['oidc_refresh_token'] = 'refresh-token-xyz'
             sess['oidc_token_expires_at'] = time.time() - 10  # expired
 
-        with patch('src.common.oidc.OIDCHelper.refresh_access_token') as mock_refresh:
+        with patch('src.auth.oidc_token_refresh.refresh_oidc_tokens') as mock_refresh:
             mock_refresh.side_effect = OIDCRefreshError("Server offline", is_transient=True, status_code=503)
             res = client.get('/dashboard')
             assert res.status_code == 200  # succeeds!
@@ -225,7 +226,7 @@ def test_oidc_session_token_refresh(client, db_session):
                 assert sess.get('oidc_refresh_retry_after', 0) > time.time()
 
         # 5. Transient failure within backoff window skips another refresh attempt
-        with patch('src.common.oidc.OIDCHelper.refresh_access_token') as mock_refresh:
+        with patch('src.auth.oidc_token_refresh.refresh_oidc_tokens') as mock_refresh:
             res = client.get('/dashboard')
             assert res.status_code == 200
             mock_refresh.assert_not_called()
@@ -239,7 +240,7 @@ def test_session_extend_endpoint(client, db_session):
         sess['oidc_refresh_token'] = 'refresh-token-xyz'
         sess['oidc_token_expires_at'] = time.time() + 120
 
-    with patch('src.common.oidc.OIDCHelper.refresh_access_token') as mock_refresh:
+    with patch('src.auth.session_lifecycle.refresh_oidc_tokens') as mock_refresh:
         mock_refresh.return_value = {
             'access_token': 'extended-access-token',
             'expires_in': 3600,
@@ -249,7 +250,8 @@ def test_session_extend_endpoint(client, db_session):
         payload = res.get_json()
         assert payload['success'] is True
         assert 'signed in for longer' in payload['message'].lower()
-        mock_refresh.assert_called_once_with('refresh-token-xyz')
+        mock_refresh.assert_called_once()
+        assert mock_refresh.call_args.args[1] == 'refresh-token-xyz'
 
         with client.session_transaction() as sess:
             assert sess['oidc_access_token'] == 'extended-access-token'

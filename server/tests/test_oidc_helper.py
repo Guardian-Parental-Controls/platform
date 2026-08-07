@@ -236,6 +236,10 @@ def test_refresh_access_token_http_errors(mock_post):
     # Test definitive HTTP 400 error (e.g. invalid grant/revoked token)
     mock_response_400 = MagicMock()
     mock_response_400.status_code = 400
+    mock_response_400.json.return_value = {
+        'error': 'invalid_grant',
+        'error_description': 'Refresh token has expired',
+    }
     http_error_400 = requests.HTTPError("Bad Request", response=mock_response_400)
     mock_post.side_effect = http_error_400
 
@@ -243,10 +247,28 @@ def test_refresh_access_token_http_errors(mock_post):
         helper.refresh_access_token("revoked-token")
     assert not exc_info.value.is_transient
     assert exc_info.value.status_code == 400
+    assert exc_info.value.oauth_error == 'invalid_grant'
+
+    # Test transient HTTP 400 error for provider/client configuration issues
+    mock_response_400_client = MagicMock()
+    mock_response_400_client.status_code = 400
+    mock_response_400_client.json.return_value = {
+        'error': 'invalid_client',
+        'error_description': 'Client authentication failed',
+    }
+    http_error_400_client = requests.HTTPError("Bad Request", response=mock_response_400_client)
+    mock_post.side_effect = http_error_400_client
+
+    with pytest.raises(OIDCRefreshError) as exc_info:
+        helper.refresh_access_token("any-token")
+    assert exc_info.value.is_transient
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.oauth_error == 'invalid_client'
 
     # Test transient HTTP 503 error
     mock_response_503 = MagicMock()
     mock_response_503.status_code = 503
+    mock_response_503.json.return_value = {}
     http_error_503 = requests.HTTPError("Service Unavailable", response=mock_response_503)
     mock_post.side_effect = http_error_503
 

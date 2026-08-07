@@ -13,10 +13,55 @@ logger = logging.getLogger(__name__)
 
 class OIDCRefreshError(RuntimeError):
     """Custom exception raised when OIDC token refresh fails."""
-    def __init__(self, message, is_transient=False, status_code=None):
+
+    def __init__(
+        self,
+        message,
+        is_transient=False,
+        status_code=None,
+        oauth_error=None,
+        oauth_error_description=None,
+    ):
         super().__init__(message)
         self.is_transient = is_transient
         self.status_code = status_code
+        self.oauth_error = oauth_error
+        self.oauth_error_description = oauth_error_description
+
+
+def _parse_oauth_error_response(response):
+    """Return (error, error_description) from an OAuth token error response."""
+    if response is None:
+        return None, None
+    try:
+        payload = response.json()
+    except ValueError:
+        return None, None
+    if not isinstance(payload, dict):
+        return None, None
+    error = payload.get('error')
+    description = payload.get('error_description')
+    return (
+        str(error).strip() if error else None,
+        str(description).strip() if description else None,
+    )
+
+
+def _classify_refresh_http_error(status_code, oauth_error):
+    """Classify whether an HTTP refresh failure should be retried or ends the session."""
+    if status_code is None:
+        return True
+    if status_code >= 500:
+        return True
+    if status_code in {401, 403}:
+        return False
+    if status_code == 400:
+        # invalid_grant usually means the refresh token is expired/revoked/reused.
+        # Other 400s are often transient provider or client configuration issues.
+        if oauth_error in {None, 'invalid_grant'}:
+            return False
+        return True
+    return status_code >= 500
 
 
 class OIDCHelper:
@@ -185,24 +230,32 @@ class OIDCHelper:
                 return response.json()
             except requests.HTTPError as exc:
                 status_code = exc.response.status_code if exc.response is not None else None
-                # Standard OAuth2 revocation/auth errors return 400 Bad Request (invalid_grant)
-                # or 401/403. Treat 5xx and others as transient.
-                is_transient = status_code is not None and status_code >= 500
+                oauth_error, oauth_error_description = _parse_oauth_error_response(exc.response)
+                is_transient = _classify_refresh_http_error(status_code, oauth_error)
                 if is_transient and attempt < max_attempts:
                     logger.warning(
-                        "OIDC token refresh attempt %s/%s failed with HTTP %s; retrying.",
+                        "OIDC token refresh attempt %s/%s failed with HTTP %s "
+                        "(oauth_error=%s); retrying.",
                         attempt,
                         max_attempts,
                         status_code,
+                        oauth_error,
                     )
                     time.sleep(1)
                     continue
-                log = logger.warning if is_transient else logger.error
-                log("HTTP error during OIDC token refresh (status %s): %s", status_code, exc)
+                log = logger.warning if is_transient else logger.info
+                log(
+                    "HTTP error during OIDC token refresh (status %s, oauth_error=%s): %s",
+                    status_code,
+                    oauth_error,
+                    exc,
+                )
                 raise OIDCRefreshError(
                     f"OIDC token refresh failed with HTTP status {status_code}: {exc}",
                     is_transient=is_transient,
                     status_code=status_code,
+                    oauth_error=oauth_error,
+                    oauth_error_description=oauth_error_description,
                 ) from exc
             except requests.RequestException as exc:
                 if attempt < max_attempts:

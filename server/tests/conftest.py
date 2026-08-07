@@ -61,6 +61,16 @@ def db_session(app):
         db.session.remove()
         db.drop_all()
 
+@pytest.fixture(scope='function', autouse=True)
+def _clear_oidc_refresh_cache():
+    """Prevent OIDC refresh cache entries leaking between tests."""
+    from src.auth.oidc_token_refresh import clear_refresh_cache_for_tests
+
+    clear_refresh_cache_for_tests()
+    yield
+    clear_refresh_cache_for_tests()
+
+
 @pytest.fixture(scope='function')
 def client(app, db_session):
     """Return a test client bound to the isolated test database."""

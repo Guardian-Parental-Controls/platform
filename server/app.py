@@ -235,6 +235,7 @@ def _refresh_oidc_tokens():
     from flask import session, redirect, url_for, jsonify, request
     import time
     from src.common.oidc import OIDCRefreshError
+    from src.auth.oidc_token_refresh import refresh_oidc_tokens
 
     if not oidc_helper.is_enabled:
         return
@@ -255,7 +256,7 @@ def _refresh_oidc_tokens():
             try:
                 _LOGGER.info("OIDC access token is expiring soon; initiating refresh flow.")
                 refresh_token = session['oidc_refresh_token']
-                new_tokens = oidc_helper.refresh_access_token(refresh_token)
+                new_tokens = refresh_oidc_tokens(oidc_helper, refresh_token)
                 
                 # Update tokens in session
                 session['oidc_access_token'] = new_tokens.get('access_token')
@@ -278,7 +279,13 @@ def _refresh_oidc_tokens():
                     )
                 else:
                     # Definitive authentication failure: Log out the user
-                    _LOGGER.error("OIDC token refresh failed with a definitive error. Logging out user: %s", exc)
+                    _LOGGER.info(
+                        "OIDC token refresh failed with a definitive error "
+                        "(status=%s, oauth_error=%s). Logging out user: %s",
+                        exc.status_code,
+                        exc.oauth_error,
+                        exc,
+                    )
                     from src.i18n.catalog import flash_t
                     flash_t('flash.auth.session_expired', 'warning')
                     session.pop('oidc_refresh_retry_after', None)
