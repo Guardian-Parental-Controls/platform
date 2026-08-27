@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -2223,10 +2223,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#devcontainer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Devcontainer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server" class="md-nav__link">
     <span class="md-ellipsis">
       
         Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
       
     </span>
   </a>
@@ -2245,10 +2278,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rust-agent-linux" class="md-nav__link">
+  <a href="#rust-agent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rust agent (Linux)
+        Rust agent
       
     </span>
   </a>
@@ -2271,17 +2304,6 @@
     <span class="md-ellipsis">
       
         Docs site
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#toolchain-notes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Toolchain notes
       
     </span>
   </a>
@@ -2372,10 +2394,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#devcontainer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Devcontainer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server" class="md-nav__link">
     <span class="md-ellipsis">
       
         Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
       
     </span>
   </a>
@@ -2394,10 +2449,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rust-agent-linux" class="md-nav__link">
+  <a href="#rust-agent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rust agent (Linux)
+        Rust agent
       
     </span>
   </a>
@@ -2420,17 +2475,6 @@
     <span class="md-ellipsis">
       
         Docs site
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#toolchain-notes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Toolchain notes
       
     </span>
   </a>
@@ -2474,45 +2518,72 @@
 
 
 <h1 id="local-development">Local development<a class="headerlink" href="#local-development" title="Permanent link">&para;</a></h1>
-<p>Minimal workflow for hacking on Guardian server and agents.</p>
+<p>Guardian provides a shared local development setup for the server, Rust agent, Android agent, and documentation.</p>
+<h2 id="devcontainer">Devcontainer<a class="headerlink" href="#devcontainer" title="Permanent link">&para;</a></h2>
+<p>The recommended development environment is the repository devcontainer. It provides Python 3.12, Rust stable, Java 17, Node 24, the Android SDK/NDK, <code>cargo-ndk</code>, and container tooling.</p>
+<p>With Docker:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>devcontainer<span class="w"> </span>up<span class="w"> </span>--workspace-folder<span class="w"> </span>.
+</code></pre></div>
+<p>With rootless Podman, expose the host socket and use Podman as the Dev Container CLI backend:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DEVCONTAINER_DOCKER_SOCKET</span><span class="o">=</span><span class="s2">"</span><span class="nv">$XDG_RUNTIME_DIR</span><span class="s2">/podman/podman.sock"</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>devcontainer<span class="w"> </span>up<span class="w"> </span>--workspace-folder<span class="w"> </span>.<span class="w"> </span>--docker-path<span class="w"> </span>podman
+</code></pre></div>
+<p>Inside the container, <code>CONTAINER_HOST</code> points the Podman CLI at the mounted host socket.</p>
+<p>Verify the toolchain with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>./scripts/verify-dev-environment.sh
+</code></pre></div>
+<h2 id="local-setup">Local setup<a class="headerlink" href="#local-setup" title="Permanent link">&para;</a></h2>
+<p>For development without the devcontainer, use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./scripts/setup-dev.sh
+</code></pre></div>
+<p>Development tool versions are defined in <code>scripts/dev-versions.env</code>.</p>
+<p>The server uses a project virtual environment at <code>server/.venv</code> with dependencies from <code>server/requirements-dev.txt</code>.</p>
 <h2 id="server">Server<a class="headerlink" href="#server" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>server
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_TOKEN</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span><span class="k">)</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">TZ</span><span class="o">=</span>UTC
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">TIMEKPR_SERVER_VERSION</span><span class="o">=</span>v0.0.0-dev
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">TIMEKPR_AGENT_WS_URL</span><span class="o">=</span>ws://127.0.0.1:5000/ws
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>python<span class="w"> </span>app.py
+<p>After setup:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">source</span><span class="w"> </span>.env
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>server
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>./.venv/bin/python<span class="w"> </span>app.py
 </code></pre></div>
 <p>Second terminal:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>server<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python<span class="w"> </span>task_worker.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">source</span><span class="w"> </span>.env
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>server
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>./.venv/bin/python<span class="w"> </span>task_worker.py
 </code></pre></div>
 <p>Default login: <strong>admin</strong> / <strong>admin</strong>. Approve devices at <code>/admin/devices</code>.</p>
+<h2 id="tests">Tests<a class="headerlink" href="#tests" title="Permanent link">&para;</a></h2>
+<p>Run the server test suite in parallel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">source</span><span class="w"> </span>.env
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">cd</span><span class="w"> </span>server
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">TESTING</span><span class="o">=</span>True<span class="w"> </span>./.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>-n<span class="w"> </span>auto
+</code></pre></div>
 <h2 id="debug-agent">Debug agent<a class="headerlink" href="#debug-agent" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>server
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python<span class="w"> </span>debug_agent.py<span class="w"> </span>--server-url<span class="w"> </span><span class="s2">&quot;ws://127.0.0.1:5000/ws&quot;</span><span class="w"> </span>--agent-version<span class="w"> </span><span class="s2">&quot;v0.0.0-dev&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">source</span><span class="w"> </span>.env
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">cd</span><span class="w"> </span>server
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>./.venv/bin/python<span class="w"> </span>debug_agent.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>--server-url<span class="w"> </span><span class="s2">"ws://127.0.0.1:5000/ws"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>--agent-version<span class="w"> </span><span class="s2">"v0.0.0-dev"</span>
 </code></pre></div>
 <p>Delete <code>debug-agent.json</code> to simulate a new device.</p>
-<h2 id="rust-agent-linux">Rust agent (Linux)<a class="headerlink" href="#rust-agent-linux" title="Permanent link">&para;</a></h2>
-<p>Requires TimeKpr-nExT D-Bus on the target machine for full enforcement.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>agent<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cargo<span class="w"> </span>build<span class="w"> </span>--release
+<h2 id="rust-agent">Rust agent<a class="headerlink" href="#rust-agent" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>cargo<span class="w"> </span>check<span class="w"> </span>--manifest-path<span class="w"> </span>agent/Cargo.toml
 </code></pre></div>
+<p>Full Linux enforcement requires TimeKpr-nExT D-Bus on the target machine.</p>
 <h2 id="android">Android<a class="headerlink" href="#android" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>android-agent
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>cp<span class="w"> </span>app/google-services.json.example<span class="w"> </span>app/google-services.json<span class="w">  </span><span class="c1"># optional FCM</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>./gradlew<span class="w"> </span>assembleDebug
+<p>Build the native Rust library and generate the UniFFI Kotlin bindings first:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./scripts/android-native-build.sh
+</code></pre></div>
+<p>Then build the debug APK:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span><span class="w"> </span>android-agent
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>./gradlew<span class="w"> </span>assembleDebug<span class="w"> </span>--no-daemon
 </code></pre></div>
 <h2 id="docs-site">Docs site<a class="headerlink" href="#docs-site" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-docs.txt
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>mkdocs<span class="w"> </span>serve<span class="w">   </span><span class="c1"># http://127.0.0.1:8000</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv-docs
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>.venv-docs/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-docs.txt
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>.venv-docs/bin/mkdocs<span class="w"> </span>serve
 </code></pre></div>
-<h2 id="toolchain-notes">Toolchain notes<a class="headerlink" href="#toolchain-notes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Python 3.12+ for local dev; Docker images may use newer Python</li>
-<li>Rust <strong>1.85+</strong> required (edition 2024 manifest)</li>
-<li>Android SDK + JDK 17 for Gradle builds</li>
-</ul>
+<p>Validate documentation changes with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>.venv-docs/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+</code></pre></div>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../contributing/">Contributing</a></li>
@@ -2592,7 +2663,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.indexes", "content.code.copy", "content.action.edit", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
