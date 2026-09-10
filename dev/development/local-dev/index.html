@@ -2245,6 +2245,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#shared-validation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared validation commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2416,6 +2427,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#shared-validation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared validation commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2538,51 +2560,60 @@
 </code></pre></div>
 <p>Development tool versions are defined in <code>scripts/dev-versions.env</code>.</p>
 <p>The server uses a project virtual environment at <code>server/.venv</code> with dependencies from <code>server/requirements-dev.txt</code>.</p>
+<h2 id="shared-validation-commands">Shared validation commands<a class="headerlink" href="#shared-validation-commands" title="Permanent link">&para;</a></h2>
+<p>Use the repository-owned validation entrypoint for local checks:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./scripts/ci.sh<span class="w"> </span>server
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>./scripts/ci.sh<span class="w"> </span>rust
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>./scripts/ci.sh<span class="w"> </span>android
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>./scripts/ci.sh<span class="w"> </span>docs
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>./scripts/ci.sh<span class="w"> </span>all
+</code></pre></div>
+<p>These commands are intended to provide the same build and validation paths for local development and future CI reuse.</p>
 <h2 id="server">Server<a class="headerlink" href="#server" title="Permanent link">&para;</a></h2>
 <p>After setup:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">source</span><span class="w"> </span>.env
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>server
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>./.venv/bin/python<span class="w"> </span>app.py
-</code></pre></div>
-<p>Second terminal:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">source</span><span class="w"> </span>.env
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>server
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>./.venv/bin/python<span class="w"> </span>task_worker.py
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>./.venv/bin/python<span class="w"> </span>app.py
+</code></pre></div>
+<p>Second terminal:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">source</span><span class="w"> </span>.env
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">cd</span><span class="w"> </span>server
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>./.venv/bin/python<span class="w"> </span>task_worker.py
 </code></pre></div>
 <p>Default login: <strong>admin</strong> / <strong>admin</strong>. Approve devices at <code>/admin/devices</code>.</p>
 <h2 id="tests">Tests<a class="headerlink" href="#tests" title="Permanent link">&para;</a></h2>
 <p>Run the server test suite in parallel:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">source</span><span class="w"> </span>.env
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">cd</span><span class="w"> </span>server
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">TESTING</span><span class="o">=</span>True<span class="w"> </span>./.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>-n<span class="w"> </span>auto
-</code></pre></div>
-<h2 id="debug-agent">Debug agent<a class="headerlink" href="#debug-agent" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">source</span><span class="w"> </span>.env
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">cd</span><span class="w"> </span>server
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>./.venv/bin/python<span class="w"> </span>debug_agent.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>--server-url<span class="w"> </span><span class="s2">"ws://127.0.0.1:5000/ws"</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>--agent-version<span class="w"> </span><span class="s2">"v0.0.0-dev"</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">TESTING</span><span class="o">=</span>True<span class="w"> </span>./.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>-n<span class="w"> </span>auto
+</code></pre></div>
+<h2 id="debug-agent">Debug agent<a class="headerlink" href="#debug-agent" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">source</span><span class="w"> </span>.env
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">cd</span><span class="w"> </span>server
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>./.venv/bin/python<span class="w"> </span>debug_agent.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span>--server-url<span class="w"> </span><span class="s2">"ws://127.0.0.1:5000/ws"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span>--agent-version<span class="w"> </span><span class="s2">"v0.0.0-dev"</span>
 </code></pre></div>
 <p>Delete <code>debug-agent.json</code> to simulate a new device.</p>
 <h2 id="rust-agent">Rust agent<a class="headerlink" href="#rust-agent" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>cargo<span class="w"> </span>check<span class="w"> </span>--manifest-path<span class="w"> </span>agent/Cargo.toml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>cargo<span class="w"> </span>check<span class="w"> </span>--manifest-path<span class="w"> </span>agent/Cargo.toml
 </code></pre></div>
 <p>Full Linux enforcement requires TimeKpr-nExT D-Bus on the target machine.</p>
 <h2 id="android">Android<a class="headerlink" href="#android" title="Permanent link">&para;</a></h2>
 <p>Build the native Rust library and generate the UniFFI Kotlin bindings first:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./scripts/android-native-build.sh
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>./scripts/android-native-build.sh
 </code></pre></div>
 <p>Then build the debug APK:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span><span class="w"> </span>android-agent
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>./gradlew<span class="w"> </span>assembleDebug<span class="w"> </span>--no-daemon
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd</span><span class="w"> </span>android-agent
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>./gradlew<span class="w"> </span>assembleDebug<span class="w"> </span>--no-daemon
 </code></pre></div>
 <h2 id="docs-site">Docs site<a class="headerlink" href="#docs-site" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv-docs
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>.venv-docs/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-docs.txt
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>.venv-docs/bin/mkdocs<span class="w"> </span>serve
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv-docs
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>.venv-docs/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-docs.txt
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>.venv-docs/bin/mkdocs<span class="w"> </span>serve
 </code></pre></div>
 <p>Validate documentation changes with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>.venv-docs/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>.venv-docs/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
 </code></pre></div>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
