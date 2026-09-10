@@ -492,18 +492,8 @@ build_android_agent() {
     configure_java_17
     ensure_gradle_wrapper
 
-    log "Bundling Android strings from i18n catalogs"
-    python "${REPO_ROOT}/scripts/i18n/manage.py" bundle --target android
-
-    log "Building Android native agent and UniFFI bindings"
-    "${REPO_ROOT}/scripts/android-native-build.sh"
-
-    log "Building Android debug APK"
-    (
-        cd "$ANDROID_DIR"
-        chmod +x ./gradlew
-        ./gradlew assembleDebug --no-daemon
-    )
+    log "Building Android agent"
+    "${REPO_ROOT}/scripts/ci/android-build.sh"
 }
 
 run_server_tests() {

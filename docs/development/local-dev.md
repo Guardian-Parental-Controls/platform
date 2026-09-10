@@ -39,6 +39,20 @@ Development tool versions are defined in `scripts/dev-versions.env`.
 
 The server uses a project virtual environment at `server/.venv` with dependencies from `server/requirements-dev.txt`.
 
+## Shared validation commands
+
+Use the repository-owned validation entrypoint for local checks:
+
+```bash
+./scripts/ci.sh server
+./scripts/ci.sh rust
+./scripts/ci.sh android
+./scripts/ci.sh docs
+./scripts/ci.sh all
+```
+
+These commands are intended to provide the same build and validation paths for local development and future CI reuse.
+
 ## Server
 
 After setup:

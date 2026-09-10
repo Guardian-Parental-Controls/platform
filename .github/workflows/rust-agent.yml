@@ -35,11 +35,11 @@ jobs:
       android_agent_changed: ${{ steps.filter.outputs.android_agent }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Detect agent-related changes
         id: filter
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             linux_agent:
@@ -65,7 +65,7 @@ jobs:
       build_cef: ${{ steps.plan.outputs.build_cef }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -89,17 +89,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libdbus-1-dev pkg-config
 
-      - name: Bundle agent i18n artifacts
-        run: |
-          python -m pip install --disable-pip-version-check PyYAML
-          python scripts/i18n/manage.py bundle --target agent
+      - name: Install i18n tooling
+        run: python -m pip install --disable-pip-version-check PyYAML
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -109,8 +107,8 @@ jobs:
         with:
           workspaces: "agent -> target"
 
-      - name: Run cargo check
-        run: cargo check --manifest-path agent/Cargo.toml
+      - name: Check Rust agent
+        run: ./scripts/ci.sh rust
 
   windows-check:
     needs: [i18n, changes]
@@ -118,7 +116,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -142,33 +140,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libdbus-1-dev pkg-config
 
-      - name: Bundle Android strings from i18n
-        run: |
-          python -m pip install --disable-pip-version-check PyYAML
-          python scripts/i18n/manage.py bundle --target agent
+      - name: Install i18n tooling
+        run: python -m pip install --disable-pip-version-check PyYAML
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: tools platform-tools build-tools;35.0.0
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
@@ -183,24 +179,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: cargo binstall -y --force cargo-ndk
 
-      - name: Build Android Rust targets
-        run: |
-          cargo ndk --target aarch64-linux-android build --lib
-        working-directory: agent
-
-      - name: Copy native libraries to Android project
-        run: |
-          mkdir -p android-agent/app/src/main/jniLibs/arm64-v8a
-          cp agent/target/aarch64-linux-android/debug/libguardian_agent.so android-agent/app/src/main/jniLibs/arm64-v8a/
-
-      - name: Generate UniFFI Kotlin bindings
-        run: |
-          cargo run --features=uniffi/cli --bin uniffi-bindgen generate --language kotlin --library --no-format --out-dir ../android-agent/app/src/main/java/ target/aarch64-linux-android/debug/libguardian_agent.so
-        working-directory: agent
-
-      - name: Build debug APK
-        working-directory: android-agent
-        run: ./gradlew assembleDebug --no-daemon
+      - name: Build Android agent
+        run: ./scripts/ci.sh android
 
       - name: Verify APK signature checksum script
         run: |
@@ -234,7 +214,7 @@ jobs:
           - aarch64-unknown-linux-gnu
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Bundle agent i18n artifacts
         run: |
@@ -310,7 +290,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Bundle agent i18n artifacts
         run: |
@@ -415,7 +395,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Bundle agent i18n artifacts
         shell: bash
@@ -504,7 +484,7 @@ jobs:
             jni_dir: x86_64
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install system dependencies
         run: |
@@ -550,7 +530,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install system dependencies
         run: |
