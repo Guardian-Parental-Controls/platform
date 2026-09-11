@@ -41,7 +41,7 @@ from src.blueprints.websocket import ws_agent_handler
 _LOGGER = logging.getLogger(__name__)
 
 # Version metadata
-__version__ = os.environ.get("TIMEKPR_SERVER_VERSION", "v1.0.0-dev")
+__version__ = os.environ.get("TIMEKPR_SERVER_VERSION", "v1.0.1-dev")
 import time
 _startup_version = __version__ if __version__ != "v0.0.0-dev" else f"v0.0.0-dev-{int(time.time())}"
 

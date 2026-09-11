@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/guardian-parental-controls/platform-server:v1.0.0
+    image: ghcr.io/guardian-parental-controls/platform-server:v1.0.1
     ports:
       - "5000:5000"
     volumes:
@@ -29,7 +29,7 @@ services:
     restart: unless-stopped
 
   tasks:
-    image: ghcr.io/guardian-parental-controls/platform-server:v1.0.0
+    image: ghcr.io/guardian-parental-controls/platform-server:v1.0.1
     command: [ "python", "task_worker.py" ]
     volumes:
       - timekpr_data:/app/instance

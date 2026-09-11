@@ -33,7 +33,7 @@ COPY scripts/android-signature-checksum.sh scripts/android-signature-checksum.sh
 RUN chmod +x scripts/android-signature-checksum.sh
 
 # Set environment variables
-ARG SERVER_VERSION=v1.0.0-dev
+ARG SERVER_VERSION=v1.0.1-dev
 ENV TIMEKPR_SERVER_VERSION=$SERVER_VERSION
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production

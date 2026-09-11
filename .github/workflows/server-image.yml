@@ -74,6 +74,10 @@ jobs:
           repository: Guardian-Parental-Controls/translations
           path: _translations
 
+      - name: Record translations revision
+        id: translations
+        run: echo "revision=$(git -C _translations rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: set up QEMU
         uses: docker/setup-qemu-action@v3
 
