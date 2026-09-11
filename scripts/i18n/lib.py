@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import json
 import re
 import shutil
@@ -10,8 +11,13 @@ from typing import Any, Iterator
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-I18N_ROOT = REPO_ROOT / 'i18n'
+def _env_path(name: str, default: Path) -> Path:
+    raw = (os.environ.get(name) or '').strip()
+    return Path(raw).expanduser().resolve() if raw else default
+
+
+REPO_ROOT = _env_path('GUARDIAN_PRODUCT_ROOT', Path(__file__).resolve().parents[2])
+I18N_ROOT = _env_path('GUARDIAN_I18N_ROOT', REPO_ROOT / 'i18n')
 SERVICES = ('server', 'agent', 'extension')
 DEFAULT_LOCALE = 'en'
 PLACEHOLDER_RE = re.compile(r'\{(\w+)\}')
@@ -302,9 +308,14 @@ def validate_catalogs(*, strict: bool = False) -> list[str]:
 
 def android_values_dir(locale: str) -> Path:
     code = locale.split('-', 1)[0]
+    android_root = (
+        REPO_ROOT / 'agent-android'
+        if (REPO_ROOT / 'agent-android').exists()
+        else REPO_ROOT / 'android-agent'
+    )
     if code == DEFAULT_LOCALE:
-        return REPO_ROOT / 'android-agent' / 'app' / 'src' / 'main' / 'res' / 'values'
-    return REPO_ROOT / 'android-agent' / 'app' / 'src' / 'main' / 'res' / f'values-{code}'
+        return android_root / 'app' / 'src' / 'main' / 'res' / 'values'
+    return android_root / 'app' / 'src' / 'main' / 'res' / f'values-{code}'
 
 
 def android_string_name(key: str) -> str:
@@ -417,13 +428,16 @@ def list_missing_keys(locale: str, service: str = 'server') -> list[str]:
 
 
 OVERLAY_RESOURCE_DIRS = (
-    REPO_ROOT / 'agent' / 'overlay_resources',
+    REPO_ROOT / 'agent-linux' / 'overlay_resources',
+    REPO_ROOT / 'agent-windows' / 'overlay_resources',
+    REPO_ROOT / 'agent-common' / 'overlay_resources',
     REPO_ROOT / 'extension',
+    REPO_ROOT / 'agent-android' / 'app' / 'src' / 'main' / 'assets',
     REPO_ROOT / 'android-agent' / 'app' / 'src' / 'main' / 'assets',
 )
 
 BLOCKED_HTML_NAME = 'blockedv2.html'
-RUST_I18N_DIR = REPO_ROOT / 'agent' / 'resources' / 'i18n'
+RUST_I18N_DIR = REPO_ROOT / 'agent-common' / 'resources' / 'i18n'
 
 
 def _js_string(value: str) -> str:
@@ -475,7 +489,7 @@ def _render_overlay_js(locale: str, catalog: dict[str, Any]) -> str:
 def bundle_overlay(*, dry_run: bool = False) -> list[Path]:
     """Generate overlay-i18n.{locale}.js and sync blockedv2.html to all agent surfaces."""
     written: list[Path] = []
-    canonical_html = REPO_ROOT / 'agent' / 'overlay_resources' / BLOCKED_HTML_NAME
+    canonical_html = OVERLAY_RESOURCE_DIRS[0] / BLOCKED_HTML_NAME
     if not canonical_html.is_file():
         raise FileNotFoundError(f'Missing canonical overlay HTML: {canonical_html}')
 
@@ -511,7 +525,7 @@ def bundle_overlay(*, dry_run: bool = False) -> list[Path]:
 
 
 def bundle_rust(*, dry_run: bool = False) -> list[Path]:
-    """Generate agent/resources/i18n/{locale}.json from desktop: catalogs."""
+    """Generate agent-common/resources/i18n/{locale}.json from desktop: catalogs."""
     written: list[Path] = []
     locales: list[str] = []
 

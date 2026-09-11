@@ -14,17 +14,18 @@ VERSION_RE = re.compile(r'^v?(\d+)\.(\d+)\.(\d+)')
 
 # Prefixes that trigger each release artifact family.
 PLATFORM_PATH_PREFIXES: dict[str, tuple[str, ...]] = {
-    'linux': ('agent/',),
-    'windows': ('agent/',),
+    'linux': ('agent-linux/', 'agent-common/'),
+    'windows': ('agent-windows/', 'agent-common/'),
     'cef': (
-        'agent/src/overlay_cef/',
-        'agent/overlay_resources/',
-        'agent/Cargo.toml',
-        'agent/Cargo.lock',
+        'agent-linux/src/overlay_cef/',
+        'agent-linux/overlay_resources/',
+        'agent-linux/Cargo.toml',
+        'agent-linux/Cargo.lock',
     ),
     'android': (
+        'agent-android/',
         'android-agent/',
-        'agent/',
+        'agent-common/',
         'i18n/',
         'scripts/i18n/',
     ),

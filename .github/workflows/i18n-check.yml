@@ -1,33 +1,10 @@
-name: i18n Check
+name: Translation check
 
 on:
   workflow_call:
   pull_request:
-    paths:
-      - "server/**"
-      - "extension/**"
-      - "agent/**"
-      - "android-agent/**"
-      - "i18n/**"
-      - "scripts/i18n/**"
-      - ".github/workflows/i18n-check.yml"
-      - ".github/workflows/server-image.yml"
-      - ".github/workflows/rust-agent.yml"
   push:
-    branches:
-      - "master"
-    tags:
-      - "v*"
-    paths:
-      - "server/**"
-      - "extension/**"
-      - "agent/**"
-      - "android-agent/**"
-      - "i18n/**"
-      - "scripts/i18n/**"
-      - ".github/workflows/i18n-check.yml"
-      - ".github/workflows/server-image.yml"
-      - ".github/workflows/rust-agent.yml"
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -37,118 +14,90 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      GUARDIAN_PRODUCT_ROOT: ${{ github.workspace }}
+      GUARDIAN_I18N_ROOT: ${{ github.workspace }}/_translations/i18n
     steps:
-      - name: Check out repository
+      - name: Check out product
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Resolve translations pull request
+        id: translations
+        env:
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+
+          body = os.environ.get('PR_BODY', '')
+          matches = re.findall(
+              r'(?im)^\s*Translations:\s*(?:Guardian-Parental-Controls/translations)?#(\d+)\s*$',
+              body,
+          )
+          if len(matches) > 1:
+              raise SystemExit('Only one Translations: #<number> footer is allowed')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f"number={matches[0] if matches else ''}\n")
+              output.write(
+                  f"ref={'refs/pull/' + matches[0] + '/head' if matches else 'main'}\n"
+              )
+          PY
+
+      - name: Check out translations
+        uses: actions/checkout@v5
+        with:
+          repository: Guardian-Parental-Controls/translations
+          ref: ${{ steps.translations.outputs.ref }}
+          path: _translations
+
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - name: Install PyYAML
-        run: python -m pip install --disable-pip-version-check PyYAML
+      - run: python -m pip install --disable-pip-version-check PyYAML
 
-      - name: List changed files
+      - name: List changed product files
         id: changed
         run: |
-          set -euo pipefail
           : > /tmp/changed-files.txt
-          use_diff=false
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            git fetch origin "${{ github.base_ref }}" --depth=1
-            git diff --name-only "origin/${{ github.base_ref }}...HEAD" > /tmp/changed-files.txt
-            use_diff=true
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]]; then
-            git diff --name-only "${{ github.event.before }}" "${{ github.event.after }}" > /tmp/changed-files.txt
-            use_diff=true
+            git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" > /tmp/changed-files.txt
+            echo "use_diff=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "use_diff=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "use_diff=${use_diff}" >> "$GITHUB_OUTPUT"
-          echo "count=$(wc -l < /tmp/changed-files.txt | tr -d ' ')" >> "$GITHUB_OUTPUT"
 
       - name: Validate translation catalogs
-        run: python scripts/i18n/manage.py validate
+        run: python _translations/scripts/i18n/manage.py validate
 
       - name: Check translation key usage
-        id: usage
+        env:
+          TRANSLATIONS_PR: ${{ steps.translations.outputs.number }}
         run: |
-          set -o pipefail
+          set +e
           args=(check-usage --report-md /tmp/i18n-report.md --json /tmp/i18n-report.json)
           if [[ "${{ steps.changed.outputs.use_diff }}" == "true" ]]; then
             args+=(--changed-files /tmp/changed-files.txt)
           fi
-          if python scripts/i18n/manage.py "${args[@]}" | tee /tmp/i18n-check.log; then
-            echo "passed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "passed=false" >> "$GITHUB_OUTPUT"
-            exit 1
+          python _translations/scripts/i18n/manage.py "${args[@]}" | tee /tmp/i18n-check.log
+          status=${PIPESTATUS[0]}
+          if [[ $status -ne 0 && -z "$TRANSLATIONS_PR" ]] &&
+             python -c 'import json; raise SystemExit(not bool(json.load(open("/tmp/i18n-report.json")).get("missing_keys")))' ; then
+            echo "::error::Open a translations PR first and add 'Translations: #<number>' to this pull request description."
           fi
+          exit "$status"
 
-      - name: Upload i18n report
+      - name: Upload translation report
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: i18n-report-${{ github.run_id }}
+          name: translation-report-${{ github.run_id }}
           path: |
             /tmp/i18n-report.md
             /tmp/i18n-report.json
             /tmp/i18n-check.log
           if-no-files-found: ignore
           retention-days: 14
-
-  comment:
-    needs: check
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Download i18n report
-        uses: actions/download-artifact@v5
-        with:
-          name: i18n-report-${{ github.run_id }}
-
-      - name: Comment on pull request
-        uses: actions/github-script@v8
-        env:
-          REPORT_PATH: i18n-report.md
-        with:
-          script: |
-            const fs = require('fs');
-            const marker = '<!-- guardian-i18n-check -->';
-            const reportPath = process.env.REPORT_PATH;
-            let body = fs.existsSync(reportPath)
-              ? fs.readFileSync(reportPath, 'utf8').trim()
-              : `${marker}\n## 🌐 Translation check\n\nThe i18n check did not produce a report. See the workflow logs for details.`;
-
-            const { owner, repo } = context.repo;
-            const issue_number = context.payload.pull_request.number;
-
-            const { data: comments } = await github.rest.issues.listComments({
-              owner,
-              repo,
-              issue_number,
-              per_page: 100,
-            });
-
-            const existing = comments.find((comment) =>
-              comment.user?.type === 'Bot' && comment.body?.includes(marker),
-            );
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number,
-                body,
-              });
-            }

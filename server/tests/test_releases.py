@@ -1,123 +1,127 @@
-"""Tests for GitHub release discovery and agent update metadata."""
+"""Tests for feed-based agent update metadata."""
 
 from unittest.mock import patch
 
 from src.agent.releases import (
-    android_release_asset_names,
+    agent_version_status,
     enrich_auth_with_agent_update,
-    get_github_release_repo,
-    linux_release_asset_names,
-    release_has_assets,
+    fetch_versions_feed,
+    get_versions_url,
     resolve_agent_update_info,
 )
 
 
-def test_get_github_release_repo_defaults_to_pairing_constant():
-    with patch.dict('os.environ', {}, clear=True):
-        assert get_github_release_repo() == 'pantherale0/timekpr-webui'
+FEED = {
+    'schema_version': 1,
+    'generated_at': '2026-09-11T09:00:00Z',
+    'components': {
+        'agent-linux': {
+            'version': '1.2.0',
+            'minimum_supported_version': '1.0.0',
+            'min_server': '1.0.0',
+            'repository': 'https://github.com/Guardian-Parental-Controls/agent-linux',
+            'artifacts': [
+                {
+                    'id': 'linux-aarch64',
+                    'url': 'https://example.com/linux.tar.gz',
+                    'checksum_url': 'https://example.com/linux.tar.gz.sha256',
+                },
+            ],
+        },
+        'agent-android': {
+            'version': '1.1.0',
+            'minimum_supported_version': '1.0.0',
+            'min_server': '1.0.0',
+            'repository': 'https://github.com/Guardian-Parental-Controls/agent-android',
+            'artifacts': [
+                {
+                    'id': 'android-apk',
+                    'url': 'https://example.com/agent.apk',
+                    'signature_checksum': 'signature',
+                },
+            ],
+        },
+    },
+}
 
 
-def test_get_github_release_repo_honours_env_override():
-    with patch.dict('os.environ', {'TIMEKPR_GITHUB_RELEASE_REPO': 'acme/guardian-fork'}):
-        assert get_github_release_repo() == 'acme/guardian-fork'
-
-
-@patch('src.agent.releases.release_has_assets', return_value=True)
-@patch('src.agent.releases._resolve_android_update_fields')
-def test_resolve_agent_update_info_android_includes_repo(mock_fields, _mock_assets):
-    mock_fields.return_value = {
-        'apk_url': 'https://example.com/agent.apk',
-        'signature_checksum': 'checksum-value',
-    }
-    info = resolve_agent_update_info('android', 'v0.68.5', server_url='wss://example.com/ws')
-    assert info['update_available'] is True
-    assert info['github_repo'] == 'pantherale0/timekpr-webui'
-    assert info['apk_url'] == 'https://example.com/agent.apk'
-    assert info['signature_checksum'] == 'checksum-value'
-
-
-@patch('src.agent.releases.release_has_assets', return_value=False)
-def test_resolve_agent_update_info_android_requires_release_assets(_mock_assets):
-    info = resolve_agent_update_info('android', 'v0.68.5', server_url='wss://example.com/ws')
-    assert info['update_available'] is False
-    assert info['apk_url'] == ''
-
-
-@patch('src.agent.releases.release_has_assets', return_value=True)
-def test_resolve_agent_update_info_linux_uses_arch_specific_assets(_mock_assets):
-    info = resolve_agent_update_info(
-        'linux',
-        'v0.68.5',
-        agent_arch='aarch64',
+def test_versions_url_has_org_default(monkeypatch):
+    monkeypatch.delenv('GUARDIAN_VERSIONS_URL', raising=False)
+    assert get_versions_url() == (
+        'https://guardian-parental-controls.github.io/versions/feed.json'
     )
-    primary, checksum = linux_release_asset_names('aarch64-unknown-linux-gnu')
+
+
+def test_versions_url_honours_override(monkeypatch):
+    monkeypatch.setenv('GUARDIAN_VERSIONS_URL', 'https://example.com/feed.json')
+    assert get_versions_url() == 'https://example.com/feed.json'
+
+
+def test_fetch_versions_feed_supports_file_fixture(tmp_path, monkeypatch):
+    feed_path = tmp_path / 'feed.json'
+    import json
+    feed_path.write_text(json.dumps(FEED), encoding='utf-8')
+    monkeypatch.setenv('GUARDIAN_VERSIONS_URL', feed_path.as_uri())
+
+    assert fetch_versions_feed(force=True) == FEED
+
+
+@patch('src.agent.releases.fetch_versions_feed', return_value=FEED)
+def test_resolve_linux_uses_arch_artifact(_mock_feed):
+    info = resolve_agent_update_info('linux', '1.0.0', agent_arch='aarch64')
+    assert info['target_version'] == '1.2.0'
     assert info['update_available'] is True
-    assert primary in info['download_url']
-    assert checksum in info['checksum_url']
+    assert info['download_url'] == 'https://example.com/linux.tar.gz'
+
+
+@patch('src.agent.releases.fetch_versions_feed', return_value=FEED)
+def test_resolve_android_uses_feed_signature(_mock_feed):
+    info = resolve_agent_update_info('android', '1.0.0')
+    assert info['update_available'] is True
+    assert info['apk_url'] == 'https://example.com/agent.apk'
+    assert info['signature_checksum'] == 'signature'
+
+
+@patch('src.agent.releases.fetch_versions_feed', return_value=FEED)
+def test_version_status_uses_support_floor_and_latest(_mock_feed):
+    assert agent_version_status('linux', '1.0.0', '1.0.0') == (True, True)
+    assert agent_version_status('linux', '1.2.0', '1.0.0') == (True, False)
+    assert agent_version_status('linux', '0.9.0', '1.0.0') == (False, False)
+
+
+@patch('src.agent.releases.fetch_versions_feed')
+def test_older_server_keeps_supported_agent_but_does_not_offer_new_build(mock_feed):
+    feed = {
+        **FEED,
+        'components': {
+            **FEED['components'],
+            'agent-linux': {
+                **FEED['components']['agent-linux'],
+                'min_server': '1.2.0',
+            },
+        },
+    }
+    mock_feed.return_value = feed
+    assert agent_version_status('linux', '1.0.0', '1.0.0') == (True, False)
 
 
 @patch('src.agent.releases.resolve_agent_update_info')
-def test_enrich_auth_with_agent_update_mandatory_sets_required(mock_resolve):
+def test_enrich_auth_sets_required_and_feed_target(mock_resolve):
     mock_resolve.return_value = {
-        'github_repo': 'pantherale0/timekpr-webui',
-        'target_version': 'v0.68.5',
+        'target_version': '1.2.0',
         'update_available': True,
-        'apk_url': 'https://example.com/agent.apk',
-        'signature_checksum': 'checksum',
-        'download_url': '',
-        'checksum_url': '',
+        'download_url': 'https://example.com/linux.tar.gz',
+        'checksum_url': 'https://example.com/linux.tar.gz.sha256',
     }
     payload = enrich_auth_with_agent_update(
         {'type': 'auth_result', 'success': False, 'message': 'update'},
-        platform='android',
-        server_version='v0.68.5',
-        agent_version='v0.67.0',
+        platform='linux',
+        server_version='1.0.0',
+        agent_version='0.9.0',
         server_url='wss://example.com/ws',
+        agent_arch='aarch64',
         mandatory=True,
     )
     assert payload['update_required'] is True
+    assert payload['target_version'] == '1.2.0'
     assert payload['update_available'] is True
-    assert payload['github_repo'] == 'pantherale0/timekpr-webui'
-    assert payload['apk_url'] == 'https://example.com/agent.apk'
-
-
-@patch('src.agent.releases.resolve_agent_update_info')
-def test_enrich_auth_with_agent_update_skips_hint_without_assets(mock_resolve):
-    mock_resolve.return_value = {
-        'github_repo': 'pantherale0/timekpr-webui',
-        'target_version': 'v0.68.5',
-        'update_available': False,
-        'apk_url': '',
-        'signature_checksum': '',
-        'download_url': '',
-        'checksum_url': '',
-    }
-    payload = enrich_auth_with_agent_update(
-        {'type': 'auth_result', 'success': True, 'message': 'ok'},
-        platform='linux',
-        server_version='v0.68.5',
-        agent_version='v0.68.0',
-        server_url='wss://example.com/ws',
-        mandatory=False,
-    )
-    assert payload['update_available'] is False
-    assert 'download_url' not in payload or payload['download_url'] == ''
-
-
-def test_android_release_asset_names_use_tag_suffix():
-    assert android_release_asset_names('v0.68.5') == (
-        'guardian-android-agent-v0.68.5.apk',
-        'guardian-android-agent-v0.68.5.signature-checksum',
-    )
-
-
-@patch('src.agent.releases._fetch_github_release_asset_names')
-def test_release_has_assets_checks_required_names(mock_fetch):
-    mock_fetch.return_value = frozenset(
-        {
-            'guardian-android-agent-v0.68.5.apk',
-            'guardian-android-agent-v0.68.5.signature-checksum',
-        }
-    )
-    primary, checksum = android_release_asset_names('v0.68.5')
-    assert release_has_assets('pantherale0/timekpr-webui', 'v0.68.5', (primary, checksum)) is True

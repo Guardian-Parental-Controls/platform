@@ -31,8 +31,6 @@ ANDROID_DPC_COMPONENT = (
 )
 ANDROID_EXTRA_SERVER_URL = 'com.guardian.agent.EXTRA_SERVER_URL'
 ANDROID_EXTRA_REGISTRATION_TOKEN = 'com.guardian.agent.EXTRA_REGISTRATION_TOKEN'
-GITHUB_RELEASE_REPO = 'pantherale0/timekpr-webui'
-
 PROVISIONING_KEY_COMPONENT = 'android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME'
 PROVISIONING_KEY_SIGNATURE = 'android.app.extra.PROVISIONING_DEVICE_ADMIN_SIGNATURE_CHECKSUM'
 PROVISIONING_KEY_DOWNLOAD = 'android.app.extra.PROVISIONING_DEVICE_ADMIN_PACKAGE_DOWNLOAD_LOCATION'
@@ -134,31 +132,35 @@ def render_pairing_qr_data_uri(payload_json: str) -> str:
 
 def get_server_version() -> str:
     """Return the configured server version string."""
-    return (os.environ.get('TIMEKPR_SERVER_VERSION') or 'v0.0.0-dev').strip()
+    return (os.environ.get('TIMEKPR_SERVER_VERSION') or 'v1.0.0-dev').strip()
 
 
 def is_dev_server_version(version: str) -> bool:
     """Return True when the server version has no published release assets."""
     normalized = (version or '').strip()
-    return not normalized or normalized == 'v0.0.0-dev'
+    return not normalized or normalized.endswith('-dev')
 
 
 def default_android_apk_url(version: str) -> str:
-    """Build the default GitHub release APK download URL for a server version."""
-    from src.agent.releases import build_github_download_url, get_github_release_repo, normalize_release_tag
+    """Return the Android APK URL published in the versions feed."""
+    from src.agent.releases import get_component
 
-    tag = normalize_release_tag(version) or 'v0.0.0-dev'
-    asset_name = f'guardian-android-agent-{tag}.apk'
-    return build_github_download_url(get_github_release_repo(), tag, asset_name)
+    component = get_component('android') or {}
+    for artifact in component.get('artifacts', []):
+        if isinstance(artifact, dict) and artifact.get('id') == 'android-apk':
+            return str(artifact.get('url') or '')
+    return ''
 
 
 def default_android_checksum_url(version: str) -> str:
-    """Build the default GitHub release signature-checksum asset URL."""
-    from src.agent.releases import build_github_download_url, get_github_release_repo, normalize_release_tag
+    """Return the Android signature checksum URL published in the feed."""
+    from src.agent.releases import get_component
 
-    tag = normalize_release_tag(version) or 'v0.0.0-dev'
-    asset_name = f'guardian-android-agent-{tag}.signature-checksum'
-    return build_github_download_url(get_github_release_repo(), tag, asset_name)
+    component = get_component('android') or {}
+    for artifact in component.get('artifacts', []):
+        if isinstance(artifact, dict) and artifact.get('id') == 'android-apk':
+            return str(artifact.get('checksum_url') or '')
+    return ''
 
 
 def get_android_apk_storage_dir() -> str:

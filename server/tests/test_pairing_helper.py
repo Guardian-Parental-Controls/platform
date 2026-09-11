@@ -32,6 +32,17 @@ from src.agent.pairing import (
     resolve_android_update_info,
 )
 
+ANDROID_COMPONENT = {
+    'version': '1.0.0',
+    'repository': 'https://github.com/Guardian-Parental-Controls/agent-android',
+    'artifacts': [{
+        'id': 'android-apk',
+        'url': 'https://example.com/guardian-android-agent-v1.0.0.apk',
+        'checksum_url': 'https://example.com/guardian-android-agent-v1.0.0.signature-checksum',
+        'signature_checksum': 'release-checksum',
+    }],
+}
+
 
 def test_build_pairing_payload_includes_registration_token():
     payload = build_pairing_payload('wss://example.com/ws', 'secret-token')
@@ -82,6 +93,19 @@ def test_build_agent_websocket_url_configured_override(app):
         ) == 'wss://public.example/ws'
 
 
+@patch('src.agent.releases.get_component')
+def test_linux_install_script_redirects_to_feed_url(mock_component, app):
+    mock_component.return_value = {
+        'install_script': 'https://example.com/install-agent.sh',
+    }
+    client = app.test_client()
+
+    response = client.get('/scripts/install-agent.sh')
+
+    assert response.status_code == 302
+    assert response.headers['Location'] == 'https://example.com/install-agent.sh'
+
+
 def test_normalize_agent_websocket_url_adds_default_path():
     assert normalize_agent_websocket_url('wss://example.com') == 'wss://example.com/ws'
 
@@ -97,10 +121,10 @@ def test_is_dev_server_version():
     assert is_dev_server_version('v0.10') is False
 
 
-def test_default_android_apk_url():
+@patch('src.agent.releases.get_component', return_value=ANDROID_COMPONENT)
+def test_default_android_apk_url(_mock_component):
     url = default_android_apk_url('v1.2.3')
-    assert url.endswith('/guardian-android-agent-v1.2.3.apk')
-    assert 'pantherale0/timekpr-webui' in url
+    assert url.endswith('/guardian-android-agent-v1.0.0.apk')
 
 
 def test_resolve_android_apk_url_dev_without_upload(app):
@@ -108,10 +132,11 @@ def test_resolve_android_apk_url_dev_without_upload(app):
         assert resolve_android_apk_url('v0.0.0-dev') == ''
 
 
-def test_resolve_android_apk_url_release_default(app):
+@patch('src.agent.releases.get_component', return_value=ANDROID_COMPONENT)
+def test_resolve_android_apk_url_release_default(_mock_component, app):
     with app.test_request_context('/'):
-        url = resolve_android_apk_url('v0.10')
-        assert 'guardian-android-agent-v0.10.apk' in url
+        url = resolve_android_apk_url('1.0.0')
+        assert 'guardian-android-agent-v1.0.0.apk' in url
 
 
 @patch('src.agent.pairing.has_uploaded_android_apk', return_value=True)
@@ -190,10 +215,15 @@ def test_provisioning_payload_json_roundtrip():
 
 @patch('src.agent.pairing.has_uploaded_android_apk', return_value=False)
 @patch('src.agent.pairing._fetch_release_signature_checksum', return_value='release-checksum')
-def test_resolve_android_provisioning_ready_with_release_assets(mock_fetch, mock_uploaded):
+@patch('src.agent.releases.get_component', return_value=ANDROID_COMPONENT)
+def test_resolve_android_provisioning_ready_with_release_assets(
+    _mock_component,
+    mock_fetch,
+    mock_uploaded,
+):
     context = resolve_android_provisioning(
         'wss://example.com/ws',
-        'v0.10',
+        '1.0.0',
         registration_token='secret',
     )
     assert context['provisioning_ready'] is True
@@ -208,13 +238,15 @@ def test_resolve_android_provisioning_not_ready_for_dev_without_overrides():
     assert context['is_dev_version'] is True
 
 
-@patch('src.agent.releases.release_has_assets', return_value=True)
-@patch('src.agent.pairing._fetch_release_signature_checksum', return_value='release-checksum')
-def test_resolve_android_update_info_with_release_assets(_mock_fetch, _mock_assets):
-    info = resolve_android_update_info('v0.10', server_url='wss://example.com/ws')
+@patch('src.agent.releases.fetch_versions_feed')
+def test_resolve_android_update_info_with_release_assets(mock_feed):
+    mock_feed.return_value = {
+        'schema_version': 1,
+        'components': {'agent-android': ANDROID_COMPONENT},
+    }
+    info = resolve_android_update_info('1.0.0', server_url='wss://example.com/ws')
     assert info['update_available'] is True
-    assert info['github_repo'] == 'pantherale0/timekpr-webui'
-    assert info['apk_url'] == default_android_apk_url('v0.10')
+    assert info['apk_url'] == ANDROID_COMPONENT['artifacts'][0]['url']
     assert info['signature_checksum'] == 'release-checksum'
 
 

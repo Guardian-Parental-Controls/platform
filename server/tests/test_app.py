@@ -1162,34 +1162,39 @@ def test_websocket_handler_accepts_mismatched_agent_on_dev_server(app, db_sessio
 
 
 def test_websocket_handler_version_checking(app, db_session, monkeypatch):
-    from app import __version__, ws_agent_handler
+    import app as app_module
+    from app import ws_agent_handler
 
-    # 1. Test mismatched agent version (non-android: no APK fields)
+    monkeypatch.setattr(app_module, '__version__', '1.0.0')
+
+    def _mock_status(platform, agent_version, server_version):
+        compatible = agent_version == '1.0.0'
+        return compatible, False
+
+    monkeypatch.setattr('src.agent.releases.agent_version_status', _mock_status)
+
     ws_mismatch = MockWS([json.dumps({
         "type": "hello",
         "system_id": "sys-mismatch",
-        "agent_version": "v0.0.1"
+        "agent_version": "0.9.0",
+        "platform": "linux",
     })])
     with app.test_request_context('/ws', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
         ws_agent_handler(ws_mismatch)
-    
+
     assert len(ws_mismatch.sent_messages) == 1
     resp = json.loads(ws_mismatch.sent_messages[0])
     assert resp['type'] == "auth_result"
     assert resp['success'] is False
     assert resp['update_required'] is True
-    assert resp['target_version'] == __version__
-    assert 'apk_url' not in resp
-    assert 'signature_checksum' not in resp
+    assert resp['update_available'] is False
 
-    # 1b. Android mismatch includes update metadata when available
     def _mock_update_info(platform, target_version, server_url='', agent_arch=None):
         return {
-            'github_repo': 'pantherale0/timekpr-webui',
             'apk_url': 'https://example.com/agent.apk',
             'signature_checksum': 'abc123checksum',
             'update_available': True,
-            'target_version': target_version,
+            'target_version': '1.1.0',
             'download_url': '',
             'checksum_url': '',
         }
@@ -1201,7 +1206,7 @@ def test_websocket_handler_version_checking(app, db_session, monkeypatch):
     ws_android_mismatch = MockWS([json.dumps({
         "type": "hello",
         "system_id": "sys-android-mismatch",
-        "agent_version": "v0.0.1",
+        "agent_version": "0.9.0",
         "platform": "android",
     })])
     with app.test_request_context('/ws', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
@@ -1210,15 +1215,15 @@ def test_websocket_handler_version_checking(app, db_session, monkeypatch):
     assert len(ws_android_mismatch.sent_messages) == 1
     resp_android = json.loads(ws_android_mismatch.sent_messages[0])
     assert resp_android['update_required'] is True
-    assert resp_android['github_repo'] == 'pantherale0/timekpr-webui'
+    assert resp_android['target_version'] == '1.1.0'
     assert resp_android['apk_url'] == 'https://example.com/agent.apk'
     assert resp_android['signature_checksum'] == 'abc123checksum'
     assert resp_android['update_available'] is True
 
-    # 2. Test missing agent version
     ws_missing_ver = MockWS([json.dumps({
         "type": "hello",
-        "system_id": "sys-missing-ver"
+        "system_id": "sys-missing-ver",
+        "platform": "linux",
     })])
     with app.test_request_context('/ws', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
         ws_agent_handler(ws_missing_ver)
@@ -1228,46 +1233,16 @@ def test_websocket_handler_version_checking(app, db_session, monkeypatch):
     assert resp2['type'] == "auth_result"
     assert resp2['success'] is False
     assert resp2['update_required'] is True
-    assert resp2['target_version'] == __version__
 
-    # 3. Test matching agent version (v prefix and no prefix stripped match)
     ws_matching = MockWS([json.dumps({
         "type": "hello",
         "system_id": "sys-pending-match",
-        "agent_version": "0.10"
+        "agent_version": "1.0.0",
+        "platform": "linux",
     })])
     with app.test_request_context('/ws', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
         ws_agent_handler(ws_matching)
-    # Since it is a new pending device, it should respond with "pairing_status" or similar (which means it passed the version check!)
-    assert len(ws_matching.sent_messages) == 1
-    resp3 = json.loads(ws_matching.sent_messages[0])
-    assert resp3['type'] == "pairing_status"
-
-    # 4. Older patch on the same release line is allowed (server v0.10 == v0.10.0)
-    ws_patch_match = MockWS([json.dumps({
-        "type": "hello",
-        "system_id": "sys-patch-match",
-        "agent_version": "v0.10.0",
-    })])
-    with app.test_request_context('/ws', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
-        ws_agent_handler(ws_patch_match)
-    assert len(ws_patch_match.sent_messages) == 1
-    resp4 = json.loads(ws_patch_match.sent_messages[0])
-    assert resp4['type'] == "pairing_status"
-
-    # 5. Agent patch ahead of server patch is rejected
-    ws_patch_ahead = MockWS([json.dumps({
-        "type": "hello",
-        "system_id": "sys-patch-ahead",
-        "agent_version": "v0.10.2",
-    })])
-    with app.test_request_context('/ws', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
-        ws_agent_handler(ws_patch_ahead)
-    assert len(ws_patch_ahead.sent_messages) == 1
-    resp5 = json.loads(ws_patch_ahead.sent_messages[0])
-    assert resp5['type'] == "auth_result"
-    assert resp5['success'] is False
-    assert resp5['update_required'] is True
+    assert json.loads(ws_matching.sent_messages[0])['type'] == "pairing_status"
 
 
 def test_new_endpoints(client, db_session):

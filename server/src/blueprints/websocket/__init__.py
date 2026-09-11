@@ -121,7 +121,11 @@ def ws_agent_handler(ws):
             platform = hello_msg.get("platform")
             agent_arch = hello_msg.get("agent_arch")
             server_url = _agent_server_url_from_request()
-            if not agent_versions_compatible(__version__, agent_version):
+            if not agent_versions_compatible(
+                __version__,
+                agent_version,
+                platform if isinstance(platform, str) else None,
+            ):
                 _LOGGER.warning(
                     "Connection rejected: Agent version %s is incompatible with server version %s",
                     agent_version or "unknown",
@@ -352,7 +356,11 @@ def ws_agent_handler(ws):
                         "success": True,
                         "message": "Authenticated successfully",
                     }
-                    if agent_patch_update_recommended(__version__, agent_version):
+                    if agent_patch_update_recommended(
+                        __version__,
+                        agent_version,
+                        platform if isinstance(platform, str) else None,
+                    ):
                         auth_result = enrich_auth_with_agent_update(
                             auth_result,
                             platform=platform if isinstance(platform, str) else None,
@@ -364,7 +372,7 @@ def ws_agent_handler(ws):
                         )
                         if auth_result.get('update_available'):
                             auth_result["message"] = (
-                                f"Authenticated successfully. Update available to {__version__}."
+                                "Authenticated successfully. An agent update is available."
                             )
                     if android_should_use_persistent_websocket(device):
                         auth_result["persistent_connection"] = True

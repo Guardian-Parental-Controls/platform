@@ -15,8 +15,6 @@ from src.agent.pairing import (
     render_pairing_qr_png,
     resolve_android_provisioning,
     get_android_apk_storage_dir,
-    is_dev_server_version,
-    GITHUB_RELEASE_REPO,
 )
 from src.common.settings import (
     _get_agent_websocket_url,
@@ -224,7 +222,30 @@ def windows_msi():
             etag=True,
         )
 
-    version = get_server_version()
-    if is_dev_server_version(version):
-        return redirect(f'https://github.com/{GITHUB_RELEASE_REPO}/releases/latest/download/{msi_filename}')
-    return redirect(f'https://github.com/{GITHUB_RELEASE_REPO}/releases/download/{version}/{msi_filename}')
+    from src.agent.releases import get_component
+
+    component = get_component('windows') or {}
+    for artifact in component.get('artifacts', []):
+        if isinstance(artifact, dict) and artifact.get('id') == 'windows-x86_64':
+            url = artifact.get('url')
+            if isinstance(url, str) and url:
+                return redirect(url)
+    return jsonify({
+        'success': False,
+        'message': 'The Windows installer is not available right now.',
+    }), 503
+
+
+@api_pairing_bp.route('/scripts/install-agent.sh', methods=['GET'])
+def linux_install_script():
+    """Keep the stable same-origin installer URL backed by the versions feed."""
+    from src.agent.releases import get_component
+
+    component = get_component('linux') or {}
+    install_script = component.get('install_script')
+    if isinstance(install_script, str) and install_script:
+        return redirect(install_script)
+    return jsonify({
+        'success': False,
+        'message': 'The Linux installer is not available right now.',
+    }), 503

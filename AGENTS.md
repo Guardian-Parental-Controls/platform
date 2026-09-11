@@ -166,8 +166,11 @@ Local test commands:
 # Server
 cd server && TESTING=True ./.venv/bin/python -m pytest -q -n auto
 
-# Agent
-cargo check --manifest-path agent/Cargo.toml
+# Agents (sibling repositories)
+cargo test --manifest-path ../agent-common/Cargo.toml
+cargo check --manifest-path ../agent-linux/Cargo.toml
+```
+
 ---
 
 ### 📂 Code Organization (Flat & Obvious)
@@ -181,16 +184,17 @@ server/
 │   ├── managers/           # agent_helper, blocklists, task_manager, etc.
 │   └── utils/              # security, crypto, validation
 ├── tests/
-agent/                      # Rust core multi-platform agent
-android-agent/              # Kotlin agent wrapper
-scripts/                    # install-agent.sh, provisioning helpers
-docs/                       # Service documentation (for both users and developers)
-extension/                  # Files related to the web browser extension
-i18n/                       # Internationalisation configuration files and UI strings, sorted by language folders (ISO 639-1), split into yaml files for each service
-i18n/*/server.yaml          # Server internationalisation configuration
-i18n/*/agent.yaml           # Agent internationalisation configuration
-i18n/*/extension.yaml       # Browser extension internationalisation configuration
+scripts/                    # install-agent.sh, provisioning helpers, i18n bundler
+extension/                  # Browser extension (packaged into the server image)
 ```
+
+Sibling repositories (not in this tree after the 1.0.0 split):
+
+- `agent-common`, `agent-linux`, `agent-windows`, `agent-android`
+- `docs`, `versions`, `translations`
+
+UI catalogs live only in `translations`. Builds set `GUARDIAN_I18N_ROOT`.
+Product PRs that add keys must include `Translations: #<n>` in the description.
 
 **Additional Rules for Contributors / AI Agents**
 - Prefer explicit, readable code over clever abstractions.

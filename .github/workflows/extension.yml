@@ -6,7 +6,6 @@ on:
       - "extension/**"
       - "scripts/test-*.js"
       - "scripts/package-extension.py"
-      - "i18n/**"
       - "scripts/i18n/**"
       - ".github/workflows/extension.yml"
   push:
@@ -28,6 +27,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Check out translations
+        uses: actions/checkout@v5
+        with:
+          repository: Guardian-Parental-Controls/translations
+          path: _translations
+
       - name: Detect extension-related changes
         id: filter
         uses: dorny/paths-filter@v3
@@ -37,7 +42,6 @@ jobs:
               - "extension/**"
               - "scripts/test-*.js"
               - "scripts/package-extension.py"
-              - "i18n/**"
               - "scripts/i18n/**"
               - ".github/workflows/extension.yml"
 
@@ -99,9 +103,12 @@ jobs:
       - name: Bundle extension i18n (_locales)
         # manifest.json sets default_locale: en — CDP Extensions.loadUnpacked
         # rejects the extension when extension/_locales/ has not been generated.
+        env:
+          GUARDIAN_PRODUCT_ROOT: ${{ github.workspace }}
+          GUARDIAN_I18N_ROOT: ${{ github.workspace }}/_translations/i18n
         run: |
           python -m pip install --disable-pip-version-check PyYAML
-          python scripts/i18n/manage.py bundle --target extension
+          python _translations/scripts/i18n/manage.py bundle --target extension
 
       - name: Install Chrome and Xvfb
         # ubuntu-24.04 runners already ship Google Chrome Stable.
@@ -183,6 +190,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Check out translations
+        uses: actions/checkout@v5
+        with:
+          repository: Guardian-Parental-Controls/translations
+          path: _translations
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -192,7 +205,13 @@ jobs:
         run: python -m pip install --disable-pip-version-check PyYAML
 
       - name: Validate i18n catalog
-        run: python scripts/i18n/manage.py validate
+        env:
+          GUARDIAN_PRODUCT_ROOT: ${{ github.workspace }}
+          GUARDIAN_I18N_ROOT: ${{ github.workspace }}/_translations/i18n
+        run: python _translations/scripts/i18n/manage.py validate
 
       - name: Bundle extension translations (dry-run check)
-        run: python scripts/i18n/manage.py bundle --target extension
+        env:
+          GUARDIAN_PRODUCT_ROOT: ${{ github.workspace }}
+          GUARDIAN_I18N_ROOT: ${{ github.workspace }}/_translations/i18n
+        run: python _translations/scripts/i18n/manage.py bundle --target extension

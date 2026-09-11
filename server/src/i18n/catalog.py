@@ -29,7 +29,8 @@ def _resolve_i18n_root() -> str:
     module_root = os.path.dirname(__file__)
     candidates = [
         os.path.abspath(os.path.join(module_root, '..', '..', 'i18n')),  # server/i18n (Docker / CI stage)
-        os.path.join(_REPO_ROOT, 'i18n'),  # repository root (local development)
+        os.path.join(os.path.dirname(_REPO_ROOT), 'translations', 'i18n'),  # sibling checkout
+        os.path.join(_REPO_ROOT, 'i18n'),  # pre-1.0 transition checkout
     ]
     for candidate in candidates:
         if os.path.isdir(candidate):

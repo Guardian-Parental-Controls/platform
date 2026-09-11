@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="pantherale0/timekpr-webui"
+DEFAULT_REPO="Guardian-Parental-Controls/agent-linux"
+DEFAULT_VERSIONS_URL="https://guardian-parental-controls.github.io/versions/feed.json"
+VERSIONS_URL="${GUARDIAN_VERSIONS_URL:-$DEFAULT_VERSIONS_URL}"
+REPO=""
 INSTALL_DIR="/usr/local/bin"
 CONFIG_DIR="/etc/guardian-agent"
 CONFIG_PATH="${CONFIG_DIR}/config.json"
@@ -26,7 +29,8 @@ WITH_OVERLAY=0
 
 usage() {
     cat <<'EOF'
-Install or update the Guardian agent from the latest GitHub release.
+Install or update the Guardian agent from the Guardian versions feed
+(or optionally from a GitHub release tag).
 
 Usage:
   install-agent.sh [options]
@@ -38,35 +42,41 @@ Options:
   --agent-token-file PATH         Read the bootstrap token from a file
   --registration-token TOKEN      Optional pairing firewall token
   --registration-token-file PATH  Read the pairing firewall token from a file
-  --repo OWNER/REPO               GitHub repository to download from
-  --tag TAG                       Install a specific release tag instead of the latest release
+  --repo OWNER/REPO               GitHub repository for --tag downloads
+                                  (default: Guardian-Parental-Controls/agent-linux)
+  --tag TAG                       Install a specific GitHub release tag instead of the versions feed
   --install-dir PATH              Directory for the agent binary
   --config-dir PATH               Directory for the agent config
   --replace-agent-token           Overwrite an existing config token
   --download-only                 Download and install the binary, but do not write config or service files
   --no-start                      Install and enable the service, but do not start/restart it
-  --with-overlay                  Also download and install the CEF overlay helper (x86_64 only).
-                                  Requires the guardian-overlay-x86_64-unknown-linux-gnu.tar.gz asset
-                                  to be present in the release. The CEF runtime is installed to
+  --with-overlay                  Also download and install the CEF overlay helper when available
+                                  in the versions feed (or matching GitHub release assets).
+                                  The CEF runtime is installed to
                                   ${INSTALL_DIR}/guardian-overlay-cef/ and a launcher wrapper is
                                   written to ${INSTALL_DIR}/guardian-overlay-helper.
   --help                          Show this help message
 
 Environment:
+  GUARDIAN_VERSIONS_URL           Versions feed URL
+                                  (default: https://guardian-parental-controls.github.io/versions/feed.json)
   GUARDIAN_SERVER_URL (or TIMEKPR_SERVER_URL)
   GUARDIAN_AGENT_TOKEN (or TIMEKPR_AGENT_TOKEN)
   GUARDIAN_REGISTRATION_TOKEN (or TIMEKPR_REGISTRATION_TOKEN)
 
 Notes:
+  - By default the script resolves agent-linux artifacts from the versions feed JSON.
+  - Use --tag (and optionally --repo) to download a specific GitHub release instead.
   - On first install, the script prompts for missing secrets if they were not supplied.
   - On upgrades, an existing config token is preserved by default so you do not accidentally
     replace the per-device secret minted after pairing.
   - On full installs, the script attempts to install and enable AppArmor plus auditd so
     application monitoring works with minimal manual setup.
-  - The script expects release assets named:
+  - Feed artifact ids are typically linux-x86_64 / linux-aarch64; release assets are named:
       guardian-agent-x86_64-unknown-linux-gnu.tar.gz
       guardian-agent-aarch64-unknown-linux-gnu.tar.gz
       guardian-overlay-x86_64-unknown-linux-gnu.tar.gz  (CEF overlay, optional)
+  - Requires agent version v1.0.0 or newer.
 EOF
 }
 
@@ -215,22 +225,6 @@ ensure_security_stack() {
     fi
 }
 
-github_api_get() {
-    local url="$1"
-    local output_path="$2"
-    local -a curl_args=(
-        -fsSL
-        -H "Accept: application/vnd.github+json"
-        -H "X-GitHub-Api-Version: 2022-11-28"
-    )
-
-    if [[ -n "${GITHUB_TOKEN:-}" ]]; then
-        curl_args+=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
-    fi
-
-    curl "${curl_args[@]}" "$url" -o "$output_path"
-}
-
 detect_target() {
     case "$(uname -m)" in
         x86_64|amd64)
@@ -243,6 +237,101 @@ detect_target() {
             die "Unsupported architecture: $(uname -m)"
             ;;
     esac
+}
+
+detect_arch_id() {
+    case "$(uname -m)" in
+        x86_64|amd64)
+            printf 'linux-x86_64'
+            ;;
+        aarch64|arm64)
+            printf 'linux-aarch64'
+            ;;
+        *)
+            die "Unsupported architecture: $(uname -m)"
+            ;;
+    esac
+}
+
+require_v1_or_newer() {
+    local version_or_tag="$1"
+    python3 - "$version_or_tag" <<'PY'
+import sys
+
+raw = sys.argv[1].strip()
+if not raw:
+    print("Error: Could not resolve agent version.", file=sys.stderr)
+    sys.exit(1)
+
+tag = raw
+if tag.startswith("v"):
+    tag = tag[1:]
+
+parts = []
+for part in tag.split("-")[0].split("+")[0].split("."):
+    try:
+        parts.append(int(part))
+    except ValueError:
+        parts.append(0)
+
+while len(parts) < 3:
+    parts.append(0)
+
+version = tuple(parts[:3])
+if version < (1, 0, 0):
+    print(
+        f"Error: Resolved version {raw} is below the minimum required version v1.0.0",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+PY
+}
+
+verify_sha256() {
+    local archive_path="$1"
+    local checksum_path="$2"
+
+    python3 - "$archive_path" "$checksum_path" <<'PY'
+import hashlib
+import pathlib
+import sys
+
+archive = pathlib.Path(sys.argv[1])
+checksum_file = pathlib.Path(sys.argv[2])
+text = checksum_file.read_text(encoding="utf-8").strip()
+if not text:
+    print("Error: checksum file is empty", file=sys.stderr)
+    sys.exit(1)
+
+expected = text.split()[0].lower()
+actual = hashlib.sha256(archive.read_bytes()).hexdigest().lower()
+if expected != actual:
+    print(
+        f"Error: SHA256 mismatch for {archive.name}: expected {expected}, got {actual}",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+print(f"Verified SHA256 for {archive.name}")
+PY
+}
+
+download_and_verify() {
+    local url="$1"
+    local dest="$2"
+    local checksum_url="${3:-}"
+
+    curl -fsSL "$url" -o "$dest"
+
+    if [[ -n "$checksum_url" ]]; then
+        local checksum_path="${dest}.sha256"
+        log "Downloading checksum from ${checksum_url}"
+        if curl -fsSL "$checksum_url" -o "$checksum_path"; then
+            log "Verifying SHA256 for $(basename "$dest")"
+            verify_sha256 "$dest" "$checksum_path" || die "Checksum verification failed for ${dest}"
+        else
+            warn "Could not download checksum from ${checksum_url}; continuing without verification"
+        fi
+    fi
 }
 
 get_existing_config_value() {
@@ -322,9 +411,61 @@ EOF
     chmod 0644 "$SERVICE_PATH"
 }
 
+resolve_from_feed() {
+    local feed_json="$1"
+    local arch_id="$2"
+    local out_file="$3"
+
+    python3 - "$feed_json" "$arch_id" "$out_file" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+feed_path, arch_id, out_path = sys.argv[1:4]
+with open(feed_path, encoding="utf-8") as handle:
+    data = json.load(handle)
+
+component = (data.get("components") or {}).get("agent-linux")
+if not component:
+    print("Error: versions feed is missing components.agent-linux", file=sys.stderr)
+    sys.exit(1)
+
+version = str(component.get("version") or "").strip()
+artifacts = component.get("artifacts") or []
+
+agent = None
+for artifact in artifacts:
+    if artifact.get("id") == arch_id:
+        agent = artifact
+        break
+
+if agent is None or not agent.get("url"):
+    print(f"Error: versions feed has no agent-linux artifact for {arch_id}", file=sys.stderr)
+    sys.exit(1)
+
+overlay = None
+overlay_id = arch_id.replace("linux-", "linux-overlay-", 1)
+for artifact in artifacts:
+    artifact_id = str(artifact.get("id") or "")
+    url = str(artifact.get("url") or "")
+    if artifact_id == overlay_id or "guardian-overlay" in url:
+        overlay = artifact
+        break
+
+payload = {
+    "version": version,
+    "download_url": agent.get("url", ""),
+    "checksum_url": agent.get("checksum_url") or "",
+    "overlay_url": (overlay or {}).get("url") or "",
+    "overlay_checksum_url": (overlay or {}).get("checksum_url") or "",
+}
+Path(out_path).write_text(json.dumps(payload), encoding="utf-8")
+PY
+}
+
 if [[ ${EUID} -ne 0 ]]; then
     need_cmd sudo
-    exec sudo --preserve-env=GUARDIAN_SERVER_URL,GUARDIAN_AGENT_TOKEN,GUARDIAN_REGISTRATION_TOKEN,TIMEKPR_SERVER_URL,TIMEKPR_AGENT_TOKEN,TIMEKPR_REGISTRATION_TOKEN,GITHUB_TOKEN bash "$0" "$@"
+    exec sudo --preserve-env=GUARDIAN_VERSIONS_URL,GUARDIAN_SERVER_URL,GUARDIAN_AGENT_TOKEN,GUARDIAN_REGISTRATION_TOKEN,TIMEKPR_SERVER_URL,TIMEKPR_AGENT_TOKEN,TIMEKPR_REGISTRATION_TOKEN,GITHUB_TOKEN bash "$0" "$@"
 fi
 
 while [[ $# -gt 0 ]]; do
@@ -417,91 +558,70 @@ if [[ -n "$REGISTRATION_TOKEN_FILE" ]]; then
 fi
 
 TARGET="$(detect_target)"
+ARCH_ID="$(detect_arch_id)"
 ASSET_NAME="guardian-agent-${TARGET}.tar.gz"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
-RELEASE_JSON="${TMP_DIR}/release.json"
+
+DOWNLOAD_URL=""
+CHECKSUM_URL=""
+OVERLAY_DOWNLOAD_URL=""
+OVERLAY_CHECKSUM_URL=""
+RELEASE_TAG_RESOLVED=""
 
 if [[ -n "$RELEASE_TAG" ]]; then
-    RELEASE_API_URL="https://api.github.com/repos/${REPO}/releases/tags/${RELEASE_TAG}"
+    REPO="${REPO:-$DEFAULT_REPO}"
+    require_v1_or_newer "$RELEASE_TAG" || die "Version check failed. Script requires v1.0.0 or higher."
+    RELEASE_TAG_RESOLVED="$RELEASE_TAG"
+    DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${ASSET_NAME}"
+    CHECKSUM_URL="${DOWNLOAD_URL}.sha256"
+    OVERLAY_ASSET_NAME="guardian-overlay-${TARGET}.tar.gz"
+    OVERLAY_DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${OVERLAY_ASSET_NAME}"
+    OVERLAY_CHECKSUM_URL="${OVERLAY_DOWNLOAD_URL}.sha256"
+    log "Using GitHub release override ${REPO}@${RELEASE_TAG}"
 else
-    RELEASE_API_URL="https://api.github.com/repos/${REPO}/releases/latest"
-fi
+    [[ -z "$REPO" ]] || warn "--repo is ignored unless --tag is also provided"
+    FEED_JSON="${TMP_DIR}/feed.json"
+    RESOLVED_JSON="${TMP_DIR}/resolved.json"
 
-log "Resolving release metadata from ${REPO}"
-if ! github_api_get "$RELEASE_API_URL" "$RELEASE_JSON"; then
-    if [[ -n "$RELEASE_TAG" ]]; then
-        die "Could not fetch release tag ${RELEASE_TAG} from ${REPO}"
-    fi
-    die "Could not fetch the latest release from ${REPO}. Publish a tagged GitHub release or use the manual build flow."
-fi
+    log "Resolving agent-linux artifacts from ${VERSIONS_URL}"
+    curl -fsSL "$VERSIONS_URL" -o "$FEED_JSON" \
+        || die "Could not fetch versions feed from ${VERSIONS_URL}"
 
-RELEASE_TAG_RESOLVED="$(python3 - "$RELEASE_JSON" <<'PY'
+    resolve_from_feed "$FEED_JSON" "$ARCH_ID" "$RESOLVED_JSON" \
+        || die "Could not resolve agent-linux artifacts from the versions feed"
+
+    eval "$(python3 - "$RESOLVED_JSON" <<'PY'
 import json
-import sys
-with open(sys.argv[1], encoding="utf-8") as handle:
-    data = json.load(handle)
-print(data.get("tag_name", ""))
-PY
-)"
-
-log "Verifying release version is at least v0.55"
-if ! python3 - "$RELEASE_TAG_RESOLVED" <<'PY'
-import sys
-
-tag = sys.argv[1]
-if not tag:
-    print("Error: Could not resolve release version tag.", file=sys.stderr)
-    sys.exit(1)
-
-if tag.startswith('v'):
-    tag = tag[1:]
-
-parts = []
-for part in tag.split('-')[0].split('+')[0].split('.'):
-    try:
-        parts.append(int(part))
-    except ValueError:
-        parts.append(0)
-
-while len(parts) < 3:
-    parts.append(0)
-
-version = tuple(parts[:3])
-min_version = (0, 55, 0)
-
-if version < min_version:
-    print(f"Error: Resolved version {sys.argv[1]} is below the minimum required version v0.55", file=sys.stderr)
-    sys.exit(1)
-PY
-then
-    die "Version check failed. Script requires v0.55 or higher."
-fi
-
-DOWNLOAD_URL="$(python3 - "$RELEASE_JSON" "$ASSET_NAME" <<'PY'
-import json
+import shlex
 import sys
 
 with open(sys.argv[1], encoding="utf-8") as handle:
     data = json.load(handle)
 
-asset_name = sys.argv[2]
-for asset in data.get("assets", []):
-    if asset.get("name") == asset_name:
-        print(asset.get("browser_download_url", ""))
-        break
+def emit(name, value):
+    print(f"{name}={shlex.quote(value)}")
+
+emit("RELEASE_TAG_RESOLVED", data.get("version") or "")
+emit("DOWNLOAD_URL", data.get("download_url") or "")
+emit("CHECKSUM_URL", data.get("checksum_url") or "")
+emit("OVERLAY_DOWNLOAD_URL", data.get("overlay_url") or "")
+emit("OVERLAY_CHECKSUM_URL", data.get("overlay_checksum_url") or "")
 PY
 )"
 
-[[ -n "$RELEASE_TAG_RESOLVED" ]] || die "GitHub release metadata did not contain a tag name"
-[[ -n "$DOWNLOAD_URL" ]] || die "Release ${RELEASE_TAG_RESOLVED} does not contain asset ${ASSET_NAME}"
+    [[ -n "$RELEASE_TAG_RESOLVED" ]] || die "Versions feed did not include an agent-linux version"
+    [[ -n "$DOWNLOAD_URL" ]] || die "Versions feed did not include a download URL for ${ARCH_ID}"
+    require_v1_or_newer "$RELEASE_TAG_RESOLVED" || die "Version check failed. Script requires v1.0.0 or higher."
+    log "Resolved agent-linux version ${RELEASE_TAG_RESOLVED} (${ARCH_ID})"
+fi
 
 ARCHIVE_PATH="${TMP_DIR}/${ASSET_NAME}"
 EXTRACT_DIR="${TMP_DIR}/extract"
 mkdir -p "$EXTRACT_DIR"
 
-log "Downloading ${ASSET_NAME} from release ${RELEASE_TAG_RESOLVED}"
-curl -fsSL "$DOWNLOAD_URL" -o "$ARCHIVE_PATH"
+log "Downloading ${ASSET_NAME} (version ${RELEASE_TAG_RESOLVED})"
+download_and_verify "$DOWNLOAD_URL" "$ARCHIVE_PATH" "$CHECKSUM_URL"
 
 log "Extracting release archive"
 tar -xzf "$ARCHIVE_PATH" -C "$EXTRACT_DIR"
@@ -512,74 +632,65 @@ install -m 0755 "${EXTRACT_DIR}/guardian-agent" "${INSTALL_DIR}/guardian-agent"
 log "Installed binary to ${INSTALL_DIR}/guardian-agent"
 
 # ---------------------------------------------------------------------------
-# Optional CEF overlay helper (x86_64 Linux only, requires --with-overlay)
+# Optional CEF overlay helper (requires --with-overlay)
 # ---------------------------------------------------------------------------
 if [[ "$WITH_OVERLAY" -eq 1 ]]; then
     OVERLAY_ASSET_NAME="guardian-overlay-${TARGET}.tar.gz"
-    OVERLAY_DOWNLOAD_URL="$(python3 - "$RELEASE_JSON" "$OVERLAY_ASSET_NAME" <<'PY'
-import json
-import sys
-with open(sys.argv[1], encoding="utf-8") as handle:
-    data = json.load(handle)
-asset_name = sys.argv[2]
-for asset in data.get("assets", []):
-    if asset.get("name") == asset_name:
-        print(asset.get("browser_download_url", ""))
-        break
-PY
-    )"
 
     if [[ -z "$OVERLAY_DOWNLOAD_URL" ]]; then
-        warn "--with-overlay requested but release ${RELEASE_TAG_RESOLVED} does not contain ${OVERLAY_ASSET_NAME}."
+        warn "--with-overlay requested but no overlay artifact was found for this install source."
         warn "Overlay helper will not be installed. Build the CEF overlay on x86_64 first."
     else
         OVERLAY_ARCHIVE="${TMP_DIR}/${OVERLAY_ASSET_NAME}"
         OVERLAY_EXTRACT_DIR="${TMP_DIR}/overlay-extract"
         mkdir -p "$OVERLAY_EXTRACT_DIR"
 
-        log "Downloading ${OVERLAY_ASSET_NAME} from release ${RELEASE_TAG_RESOLVED}"
-        curl -fsSL "$OVERLAY_DOWNLOAD_URL" -o "$OVERLAY_ARCHIVE"
+        log "Downloading ${OVERLAY_ASSET_NAME} (version ${RELEASE_TAG_RESOLVED})"
+        if ! download_and_verify "$OVERLAY_DOWNLOAD_URL" "$OVERLAY_ARCHIVE" "${OVERLAY_CHECKSUM_URL:-}"; then
+            warn "--with-overlay requested but overlay download failed for ${OVERLAY_DOWNLOAD_URL}."
+            warn "Overlay helper will not be installed. Build the CEF overlay on x86_64 first."
+        else
+            log "Extracting overlay archive"
+            tar -xzf "$OVERLAY_ARCHIVE" -C "$OVERLAY_EXTRACT_DIR"
 
-        log "Extracting overlay archive"
-        tar -xzf "$OVERLAY_ARCHIVE" -C "$OVERLAY_EXTRACT_DIR"
+            [[ -f "${OVERLAY_EXTRACT_DIR}/guardian-overlay-helper" ]] || \
+                die "Overlay archive did not contain the guardian-overlay-helper binary"
 
-        [[ -f "${OVERLAY_EXTRACT_DIR}/guardian-overlay-helper" ]] || \
-            die "Overlay archive did not contain the guardian-overlay-helper binary"
+            # Install CEF runtime libraries into a dedicated subdirectory so they
+            # don't pollute the system library path.
+            CEF_RUNTIME_DIR="${INSTALL_DIR}/guardian-overlay-cef"
+            install -d -m 0755 "$CEF_RUNTIME_DIR"
 
-        # Install CEF runtime libraries into a dedicated subdirectory so they
-        # don't pollute the system library path.
-        CEF_RUNTIME_DIR="${INSTALL_DIR}/guardian-overlay-cef"
-        install -d -m 0755 "$CEF_RUNTIME_DIR"
+            # Copy every file from the archive except the main binary itself.
+            find "$OVERLAY_EXTRACT_DIR" -maxdepth 1 ! -name 'guardian-overlay-helper' \
+                -not -type d -exec install -m 0644 {} "$CEF_RUNTIME_DIR/" \;
+            # Preserve subdirectories (locales/, Resources/, swiftshader/) with their contents.
+            for d in "${OVERLAY_EXTRACT_DIR}"/*/; do
+                [[ -d "$d" ]] || continue
+                dir_name="$(basename "$d")"
+                install -d -m 0755 "${CEF_RUNTIME_DIR}/${dir_name}"
+                cp -r "${d}/." "${CEF_RUNTIME_DIR}/${dir_name}/"
+            done
 
-        # Copy every file from the archive except the main binary itself.
-        find "$OVERLAY_EXTRACT_DIR" -maxdepth 1 ! -name 'guardian-overlay-helper' \
-            -not -type d -exec install -m 0644 {} "$CEF_RUNTIME_DIR/" \;
-        # Preserve subdirectories (locales/, Resources/, swiftshader/) with their contents.
-        for d in "${OVERLAY_EXTRACT_DIR}"/*/; do
-            [[ -d "$d" ]] || continue
-            dir_name="$(basename "$d")"
-            install -d -m 0755 "${CEF_RUNTIME_DIR}/${dir_name}"
-            cp -r "${d}/." "${CEF_RUNTIME_DIR}/${dir_name}/"
-        done
-
-        # Write a thin launcher wrapper that sets LD_LIBRARY_PATH to the CEF
-        # runtime directory before exec-ing the real binary.  guardian-agent
-        # spawns this wrapper by name (guardian-overlay-helper) so find_helper()
-        # picks it up from the same directory.
-        install -d -m 0755 "$INSTALL_DIR"
-        cat > "${INSTALL_DIR}/guardian-overlay-helper" <<WRAPPER
+            # Write a thin launcher wrapper that sets LD_LIBRARY_PATH to the CEF
+            # runtime directory before exec-ing the real binary.  guardian-agent
+            # spawns this wrapper by name (guardian-overlay-helper) so find_helper()
+            # picks it up from the same directory.
+            install -d -m 0755 "$INSTALL_DIR"
+            cat > "${INSTALL_DIR}/guardian-overlay-helper" <<WRAPPER
 #!/usr/bin/env bash
 export LD_LIBRARY_PATH="${CEF_RUNTIME_DIR}\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}"
 exec "${CEF_RUNTIME_DIR}/guardian-overlay-helper-bin" "\$@"
 WRAPPER
-        chmod 0755 "${INSTALL_DIR}/guardian-overlay-helper"
+            chmod 0755 "${INSTALL_DIR}/guardian-overlay-helper"
 
-        # Install the real binary under a private name inside the CEF dir.
-        install -m 0755 "${OVERLAY_EXTRACT_DIR}/guardian-overlay-helper" \
-            "${CEF_RUNTIME_DIR}/guardian-overlay-helper-bin"
+            # Install the real binary under a private name inside the CEF dir.
+            install -m 0755 "${OVERLAY_EXTRACT_DIR}/guardian-overlay-helper" \
+                "${CEF_RUNTIME_DIR}/guardian-overlay-helper-bin"
 
-        log "Installed overlay helper to ${CEF_RUNTIME_DIR}/guardian-overlay-helper-bin"
-        log "Installed overlay launcher wrapper to ${INSTALL_DIR}/guardian-overlay-helper"
+            log "Installed overlay helper to ${CEF_RUNTIME_DIR}/guardian-overlay-helper-bin"
+            log "Installed overlay launcher wrapper to ${INSTALL_DIR}/guardian-overlay-helper"
+        fi
     fi
 fi
 

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Android 12+ provisioning handlers break QR setup on older releases when enabled. -->
-    <bool name="provision_mode_compliance_enabled">false</bool>
-</resources>

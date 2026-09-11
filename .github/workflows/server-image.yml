@@ -4,12 +4,12 @@ on:
   pull_request:
     paths:
       - "server/**"
-      - "i18n/**"
       - "extension/**"
       - "scripts/package-extension.py"
       - "scripts/i18n/**"
       - "docker-compose.yaml"
       - ".github/workflows/server-image.yml"
+      - ".github/workflows/i18n-check.yml"
   push:
     branches:
       - "master"
@@ -33,6 +33,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Check out translations
+        uses: actions/checkout@v5
+        with:
+          repository: Guardian-Parental-Controls/translations
+          path: _translations
+
+      - name: Record translations revision
+        id: translations
+        run: echo "revision=$(git -C _translations rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Detect server-related changes
         id: filter
         uses: dorny/paths-filter@v3
@@ -40,12 +50,12 @@ jobs:
           filters: |
             server:
               - "server/**"
-              - "i18n/**"
               - "extension/**"
               - "scripts/package-extension.py"
               - "scripts/i18n/**"
               - "docker-compose.yaml"
               - ".github/workflows/server-image.yml"
+              - ".github/workflows/i18n-check.yml"
 
   build-and-publish:
     needs: [i18n, changes]
@@ -57,6 +67,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Check out translations
+        uses: actions/checkout@v5
+        with:
+          repository: Guardian-Parental-Controls/translations
+          path: _translations
 
       - name: set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -92,10 +108,13 @@ jobs:
           python-version: "3.12"
 
       - name: Stage i18n catalogs
+        env:
+          GUARDIAN_PRODUCT_ROOT: ${{ github.workspace }}
+          GUARDIAN_I18N_ROOT: ${{ github.workspace }}/_translations/i18n
         run: |
           python -m pip install --disable-pip-version-check PyYAML
-          python scripts/i18n/manage.py bundle --target server
-          python scripts/i18n/manage.py bundle --target extension
+          python _translations/scripts/i18n/manage.py bundle --target server
+          python _translations/scripts/i18n/manage.py bundle --target extension
 
       - name: Package Chrome extension
         env:
@@ -137,3 +156,42 @@ jobs:
             SERVER_VERSION=${{ steps.tag.outputs.value }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Create versions automation token
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: versions-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GUARDIAN_VERSIONS_APP_ID }}
+          private-key: ${{ secrets.GUARDIAN_VERSIONS_PRIVATE_KEY }}
+          owner: Guardian-Parental-Controls
+          repositories: versions
+
+      - name: Publish platform version
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ steps.versions-token.outputs.token }}
+          VERSION: ${{ github.ref_name }}
+        run: |
+          version="${VERSION#v}"
+          gh api "repos/Guardian-Parental-Controls/versions/dispatches" \
+            --method POST \
+            --input - <<EOF
+          {
+            "event_type": "component-release",
+            "client_payload": {
+              "component": "platform",
+              "version": "${version}",
+              "repository": "https://github.com/Guardian-Parental-Controls/platform",
+              "minimum_supported_version": "1.0.0",
+              "protocol_version": 1,
+              "translations_revision": "${{ steps.translations.outputs.revision }}",
+              "artifacts": [
+                {
+                  "id": "container",
+                  "url": "ghcr.io/guardian-parental-controls/platform-server:${VERSION}"
+                }
+              ]
+            }
+          }
+          EOF

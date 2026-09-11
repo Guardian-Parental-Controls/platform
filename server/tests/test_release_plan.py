@@ -32,7 +32,7 @@ def test_patch_release_builds_only_changed_platforms():
     plan = compute_build_plan(
         'v0.68.2',
         previous_tag='v0.68.1',
-        changed=['android-agent/app/build.gradle.kts'],
+        changed=['agent-android/app/build.gradle.kts'],
     )
     assert plan['release_mode'] == 'patch'
     assert plan['build_android'] is True
@@ -42,16 +42,27 @@ def test_patch_release_builds_only_changed_platforms():
     assert plan['publish_assets'] is True
 
 
-def test_patch_release_agent_change_rebuilds_linux_windows_and_android():
+def test_patch_release_agent_linux_rebuilds_linux_only():
     plan = compute_build_plan(
         'v0.68.2',
         previous_tag='v0.68.1',
-        changed=['agent/src/main.rs'],
+        changed=['agent-linux/src/main.rs'],
+    )
+    assert plan['build_linux'] is True
+    assert plan['build_windows'] is False
+    assert plan['build_android'] is False
+    assert plan['build_cef'] is False
+
+
+def test_patch_release_agent_common_rebuilds_all_agents():
+    plan = compute_build_plan(
+        'v0.68.2',
+        previous_tag='v0.68.1',
+        changed=['agent-common/src/lib.rs'],
     )
     assert plan['build_linux'] is True
     assert plan['build_windows'] is True
     assert plan['build_android'] is True
-    assert plan['build_cef'] is False
 
 
 def test_patch_release_without_agent_changes_skips_all_builds():

@@ -160,10 +160,14 @@ def test_bundle_rust_writes_json(tmp_path, monkeypatch):
     assert payload['desktop']['domain_blocked_title'] == 'Website Blocked'
 
 
-def test_manage_cli_validate():
-    manage_path = Path(__file__).resolve().parents[2] / 'scripts' / 'i18n' / 'manage.py'
-    spec = importlib.util.spec_from_file_location('i18n_manage', manage_path)
-    manage = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(manage)
-    assert manage.main(['validate']) == 0
+def test_manage_cli_validate(tmp_path, monkeypatch):
+    i18n_root = tmp_path / 'i18n'
+    en_dir = i18n_root / 'en'
+    en_dir.mkdir(parents=True)
+    for service in ('server', 'agent', 'extension'):
+        (en_dir / f'{service}.yaml').write_text(
+            'meta:\n  locale: en\n  label: English\n',
+            encoding='utf-8',
+        )
+    monkeypatch.setattr(lib, 'I18N_ROOT', i18n_root)
+    assert lib.validate_catalogs() == []

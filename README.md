@@ -1,67 +1,55 @@
-# Guardian parental controls
+# Guardian platform
 
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://pantherale0.github.io/timekpr-webui/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://guardian-parental-controls.github.io/docs/)
 
-Guardian is a cross-platform parental control system with a secure **server–agent architecture**. A Flask server hosts the Web UI, REST APIs, and WebSocket hub. Managed devices run outbound client agents (Rust on Linux and Windows, Kotlin on Android). **Nintendo Switch** and **Xbox** consoles integrate via cloud parental-control APIs—no on-console agent required.
+Guardian is a multi-tenant parental-control server. This repository contains
+the Flask web application, WebSocket hub, background worker, browser extension,
+and container packaging.
 
-## Documentation
+## Related repositories
 
-**Full documentation:** [https://pantherale0.github.io/timekpr-webui/](https://pantherale0.github.io/timekpr-webui/)
+- [agent-common](https://github.com/Guardian-Parental-Controls/agent-common) —
+  shared protocol and policy logic
+- [agent-linux](https://github.com/Guardian-Parental-Controls/agent-linux)
+- [agent-windows](https://github.com/Guardian-Parental-Controls/agent-windows)
+- [agent-android](https://github.com/Guardian-Parental-Controls/agent-android)
+- [docs](https://github.com/Guardian-Parental-Controls/docs)
+- [translations](https://github.com/Guardian-Parental-Controls/translations)
+- [versions](https://github.com/Guardian-Parental-Controls/versions) — compiled
+  release feed
 
-| Topic | Guide |
-|-------|--------|
-| Deploy the server | [Server deployment](https://pantherale0.github.io/timekpr-webui/getting-started/server-deployment/) |
-| Compare vs Family Link, Bark, etc. | [vs commercial parental controls](https://pantherale0.github.io/timekpr-webui/getting-started/comparison/) |
-| Linux agent | [Linux agent](https://pantherale0.github.io/timekpr-webui/platforms/linux-agent/) |
-| Android agent | [Android agent](https://pantherale0.github.io/timekpr-webui/platforms/android-agent/) |
-| Windows agent | [Windows agent](https://pantherale0.github.io/timekpr-webui/platforms/windows-agent/) |
-| Nintendo / Xbox | [Cloud consoles](https://pantherale0.github.io/timekpr-webui/workflows/cloud-console-setup/) |
-| Troubleshooting | [Troubleshooting](https://pantherale0.github.io/timekpr-webui/troubleshooting/) |
-
-Build docs locally:
-
-```bash
-pip install -r requirements-docs.txt
-mkdocs serve
-```
-
-## Quick start (Docker)
+## Quick start
 
 ```bash
-git clone https://github.com/pantherale0/timekpr-webui.git
-cd timekpr-webui
-cp .env.example .env   # set AGENT_TOKEN and TZ
-docker-compose up -d --build
+cp .env.example .env
+docker compose up -d
 ```
 
-Sign in at the dashboard with **admin** / **admin** and change the password under **Settings**.
+Sign in at the dashboard with **admin** / **admin**, then change the password
+under **Settings**.
 
-## Install Linux agent
+## Development
 
 ```bash
-curl -fsSLo /tmp/install-timekpr-agent.sh \
-  https://raw.githubusercontent.com/pantherale0/timekpr-webui/master/scripts/install-agent.sh
-chmod 0755 /tmp/install-timekpr-agent.sh
-sudo /tmp/install-timekpr-agent.sh --server-url "wss://your-domain.com/ws"
+./scripts/setup-dev.sh
+cd server
+TESTING=True ./.venv/bin/python -m pytest -q -n auto
 ```
 
-Approve the device under **Admin → Devices**.
+UI strings are maintained in the translations repository. Product pull
+requests which add keys must link the translations pull request:
 
-## Repository layout
+```text
+Translations: #42
+```
 
-| Path | Description |
-|------|-------------|
-| `server/` | Flask web app, worker, tests |
-| `agent/` | Rust Linux/Windows agent |
-| `android-agent/` | Kotlin Android agent |
-| `docs/` | MkDocs documentation source |
-| `scripts/` | Install and release helpers |
+## Version 1.0
 
-
-## Contributing
-
-See [Local development](https://pantherale0.github.io/timekpr-webui/development/local-dev/), [Contributing](https://pantherale0.github.io/timekpr-webui/development/contributing/), and [AGENTS.md](AGENTS.md) for the development environment and contributor conventions.
+Version 1.0 is a breaking repository and release-system change. Agent versions,
+repositories, and artifact URLs come only from the
+[compiled versions feed](https://guardian-parental-controls.github.io/versions/feed.json).
+See the [migration guide](https://guardian-parental-controls.github.io/docs/latest/getting-started/v1-migration/).
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see `LICENSE`.
