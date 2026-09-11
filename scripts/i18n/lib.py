@@ -486,12 +486,21 @@ def _render_overlay_js(locale: str, catalog: dict[str, Any]) -> str:
     )
 
 
+def resolve_canonical_overlay_html() -> Path:
+    """Pick the first existing blockedv2.html across configured overlay roots."""
+    candidates: list[Path] = [directory / BLOCKED_HTML_NAME for directory in OVERLAY_RESOURCE_DIRS]
+    candidates.append(REPO_ROOT / 'extension' / BLOCKED_HTML_NAME)
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    searched = ', '.join(str(path) for path in candidates)
+    raise FileNotFoundError(f'Missing canonical overlay HTML (searched: {searched})')
+
+
 def bundle_overlay(*, dry_run: bool = False) -> list[Path]:
-    """Generate overlay-i18n.{locale}.js and sync blockedv2.html to all agent surfaces."""
+    """Generate overlay-i18n.{locale}.js and sync blockedv2.html to present surfaces."""
     written: list[Path] = []
-    canonical_html = OVERLAY_RESOURCE_DIRS[0] / BLOCKED_HTML_NAME
-    if not canonical_html.is_file():
-        raise FileNotFoundError(f'Missing canonical overlay HTML: {canonical_html}')
+    canonical_html = resolve_canonical_overlay_html()
 
     js_by_locale: dict[str, str] = {}
     for locale in discover_locales('agent'):
@@ -503,7 +512,11 @@ def bundle_overlay(*, dry_run: bool = False) -> list[Path]:
     if not js_by_locale:
         raise RuntimeError('No overlay section found in agent.yaml catalogs')
 
+    extension_root = REPO_ROOT / 'extension'
     for target_dir in OVERLAY_RESOURCE_DIRS:
+        # Do not create sibling agent trees inside platform CI checkouts.
+        if not target_dir.exists() and target_dir != extension_root:
+            continue
         for locale, js_content in js_by_locale.items():
             out_path = target_dir / f'overlay-i18n.{locale}.js'
             if dry_run:

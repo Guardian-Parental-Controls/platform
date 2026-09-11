@@ -41,7 +41,10 @@ def _cmd_add_locale(args: argparse.Namespace) -> int:
     )
     print(f'Created locale "{args.locale}" ({len(created)} catalog file(s)):')
     for path in created:
-        print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+        try:
+            print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+        except ValueError:
+            print(f'  - {path}')
     return 0
 
 
@@ -159,25 +162,37 @@ def _cmd_bundle(args: argparse.Namespace) -> int:
             action = 'Would write' if args.dry_run else 'Wrote'
             print(f'{action} {len(paths)} Android strings.xml file(s)')
             for path in paths:
-                print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                try:
+                    print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                except ValueError:
+                    print(f'  - {path}')
         elif target == 'extension':
             paths = bundle_extension(dry_run=args.dry_run)
             action = 'Would write' if args.dry_run else 'Wrote'
             print(f'{action} {len(paths)} extension locale file(s)')
             for path in paths:
-                print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                try:
+                    print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                except ValueError:
+                    print(f'  - {path}')
         elif target == 'overlay':
             paths = bundle_overlay(dry_run=args.dry_run)
             action = 'Would write' if args.dry_run else 'Wrote'
             print(f'{action} {len(paths)} overlay asset file(s)')
             for path in paths:
-                print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                try:
+                    print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                except ValueError:
+                    print(f'  - {path}')
         elif target == 'rust':
             paths = bundle_rust(dry_run=args.dry_run)
             action = 'Would write' if args.dry_run else 'Wrote'
             print(f'{action} {len(paths)} Rust i18n JSON file(s)')
             for path in paths:
-                print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                try:
+                    print(f'  - {path.relative_to(I18N_ROOT.parent)}')
+                except ValueError:
+                    print(f'  - {path}')
         elif target == 'agent':
             paths = bundle_agent(dry_run=args.dry_run)
             action = 'Would write' if args.dry_run else 'Wrote'
