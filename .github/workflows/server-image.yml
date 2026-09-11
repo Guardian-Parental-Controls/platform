@@ -162,8 +162,9 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Create versions automation token
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && secrets.GUARDIAN_VERSIONS_APP_ID != ''
         id: versions-token
+        continue-on-error: true
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.GUARDIAN_VERSIONS_APP_ID }}
@@ -172,7 +173,7 @@ jobs:
           repositories: versions
 
       - name: Publish platform version
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && steps.versions-token.outcome == 'success'
         env:
           GH_TOKEN: ${{ steps.versions-token.outputs.token }}
           VERSION: ${{ github.ref_name }}
